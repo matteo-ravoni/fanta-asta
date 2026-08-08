@@ -1,0 +1,61 @@
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/archivo-latin.woff2') format('woff2');
+}
+
+:root {
+  --colore-sfondo: #241454;
+  --colore-card: #341c6b;
+  --colore-input: #1c0f3f;
+  --colore-accento: #1ee8a6;
+  --colore-testo-su-accento: #0a2e22;
+  --colore-testo: #f4f1fb;
+  --colore-testo-secondario: rgba(244, 241, 251, 0.62);
+  --colore-testo-terziario: rgba(244, 241, 251, 0.5);
+  --colore-bordo: rgba(244, 241, 251, 0.22);
+
+  --colore-portiere-bg: #bff5e2;
+  --colore-portiere-testo: #0d3b2e;
+  --colore-difensore-bg: #7ee7c4;
+  --colore-difensore-testo: #0d3b2e;
+  --colore-centrocampista-bg: #35d9a3;
+  --colore-centrocampista-testo: #0a2e22;
+  --colore-attaccante-bg: #1ee8a6;
+  --colore-attaccante-testo: #0a2e22;
+}
+
+* {
+  box-sizing: border-box;
+  border-radius: 0 !important;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--colore-sfondo);
+  color: var(--colore-testo);
+  font-family: 'Archivo', sans-serif;
+  font-weight: 400;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+input, select, button {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+button {
+  cursor: pointer;
+}

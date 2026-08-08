@@ -1,0 +1,113 @@
+@if (caricamento()) {
+  <p class="stato-messaggio">Un attimo, controllo lo stato dell'asta…</p>
+} @else if (astaBloccata()) {
+  <div class="pagina">
+    <h1>Configurazione bloccata</h1>
+    <p class="stato-messaggio">L'asta è già stata avviata: la configurazione non può più essere modificata da qui.</p>
+  </div>
+} @else {
+  <form class="pagina" [formGroup]="form" (ngSubmit)="salva()">
+    <h1>Prepariamo l'asta!</h1>
+
+    <section class="card">
+      <h2>Partecipanti</h2>
+      <label>
+        Numero di partecipanti
+        <input type="number" formControlName="numero_partecipanti" min="2" max="20">
+      </label>
+      <label>
+        Crediti per partecipante
+        <input type="number" formControlName="crediti_iniziali" min="1">
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>Chi è a bordo?</h2>
+      <p class="sottotitolo">Un nome squadra per ogni partecipante.</p>
+      <div class="squadre" formArrayName="nomi_squadre">
+        @for (controllo of nomiSquadre.controls; track $index) {
+          <input type="text" [formControlName]="$index" [placeholder]="'Squadra ' + ($index + 1)">
+        }
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Tipo di asta</h2>
+      <label class="opzione">
+        <input type="radio" formControlName="tipo_asta" value="classica">
+        Classica
+      </label>
+      <label class="opzione">
+        <input type="radio" formControlName="tipo_asta" value="mantra">
+        Mantra
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>Composizione rosa</h2>
+      @if (form.controls.tipo_asta.value === 'classica') {
+        <label>
+          Portieri
+          <input type="number" formControlName="slot_portieri" min="1">
+        </label>
+        <label>
+          Difensori
+          <input type="number" formControlName="slot_difensori" min="1">
+        </label>
+        <label>
+          Centrocampisti
+          <input type="number" formControlName="slot_centrocampisti" min="1">
+        </label>
+        <label>
+          Attaccanti
+          <input type="number" formControlName="slot_attaccanti" min="1">
+        </label>
+      } @else {
+        <label>
+          Totale giocatori in rosa
+          <input type="number" formControlName="slot_totale_mantra" min="1">
+        </label>
+        <label>
+          di cui portieri
+          <input type="number" formControlName="slot_portieri" min="1">
+        </label>
+      }
+    </section>
+
+    <section class="card">
+      <h2>Ordine di uscita</h2>
+      <select formControlName="ordine_uscita">
+        <option value="casuale">Casuale</option>
+        <option value="per_ruolo">Per ruolo</option>
+        <option value="alfabetico">Alfabetico</option>
+      </select>
+    </section>
+
+    <section class="card">
+      <h2>Dai, carica il listone!</h2>
+      <p class="sottotitolo">File .xlsx con le colonne Id, R, RM, Nome, Squadra, Qt.A, Qt.A M, FVM, FVM M.</p>
+      <input type="file" accept=".xlsx" (change)="onFileSelezionato($event)">
+      @if (nomeFile()) {
+        <p class="sottotitolo">Selezionato: {{ nomeFile() }}</p>
+      }
+    </section>
+
+    @if (errori().length > 0) {
+      <div class="errori">
+        @for (e of errori(); track e) {
+          <p>{{ e }}</p>
+        }
+      </div>
+    }
+
+    @if (esito(); as risultato) {
+      <div class="esito">
+        <p>Si fa sul serio! Configurazione salvata: {{ risultato.numero_giocatori }} giocatori importati, {{ risultato.numero_partecipanti }} partecipanti.</p>
+      </div>
+    }
+
+    <button type="submit" [disabled]="salvataggioInCorso()">
+      {{ salvataggioInCorso() ? 'Salvataggio…' : 'Salva configurazione' }}
+    </button>
+  </form>
+}

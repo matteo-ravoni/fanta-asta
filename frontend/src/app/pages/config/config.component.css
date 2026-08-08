@@ -1,0 +1,96 @@
+.pagina {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stato-messaggio {
+  padding: 2rem 1.25rem;
+  color: var(--colore-testo-secondario);
+}
+
+.card {
+  background: var(--colore-card);
+  border: 1px solid var(--colore-bordo);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  border-bottom: 2px solid var(--colore-bordo);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.sottotitolo {
+  color: var(--colore-testo-secondario);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--colore-testo-secondario);
+}
+
+label.opzione {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+input, select {
+  background: var(--colore-input);
+  border: 1px solid var(--colore-bordo);
+  color: var(--colore-testo);
+  padding: 0.6rem 0.7rem;
+}
+
+input[type="radio"] {
+  width: auto;
+}
+
+.squadre {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.errori {
+  border: 1px solid var(--colore-accento);
+  padding: 1rem;
+  color: var(--colore-testo);
+}
+
+.errori p {
+  margin: 0.25rem 0;
+}
+
+.esito {
+  border: 1px solid var(--colore-accento);
+  background: var(--colore-input);
+  padding: 1rem;
+}
+
+button[type="submit"] {
+  background: var(--colore-accento);
+  color: var(--colore-testo-su-accento);
+  border: none;
+  padding: 0.85rem 1.5rem;
+  font-weight: 800;
+  align-self: flex-start;
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
