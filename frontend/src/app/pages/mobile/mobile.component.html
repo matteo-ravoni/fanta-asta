@@ -1,9 +1,65 @@
 @if (caricamento()) {
   <p class="stato-messaggio">Un attimo…</p>
-} @else if (partecipante()) {
+} @else if (partecipante() && asta()) {
+  @let p = partecipante()!;
+  @let a = asta()!;
+  @let mia = miaRosa();
   <div class="pagina">
-    <h1>{{ partecipante()!.nome_squadra }}</h1>
-    <p class="crediti">{{ partecipante()!.crediti_residui }} crediti residui</p>
-    <p class="sottotitolo">Sei collegato. In attesa che l'host avvii l'asta — la schermata dei rilanci arriva nella prossima tappa.</p>
+    <header class="intestazione">
+      <h1>{{ p.nome_squadra }}</h1>
+      <p class="crediti">{{ mia?.crediti_residui ?? p.crediti_residui }} crediti residui</p>
+      @if (mia && configurazione(); as cfg) {
+        @if (a.tipo_asta === 'classica') {
+          <p class="rosa-riga">P {{ mia.ruoli['P'] }}/{{ cfg.slot_portieri }} · D {{ mia.ruoli['D'] }}/{{ cfg.slot_difensori }} · C {{ mia.ruoli['C'] }}/{{ cfg.slot_centrocampisti }} · A {{ mia.ruoli['A'] }}/{{ cfg.slot_attaccanti }}</p>
+        } @else {
+          <p class="rosa-riga">{{ mia.totale }}/{{ cfg.slot_totale_mantra }} giocatori · {{ mia.ruoli['P'] }}/{{ cfg.slot_portieri }} portieri</p>
+        }
+      }
+    </header>
+
+    @let g = a.giocatore_corrente;
+    @if (a.stato === 'sospesa') {
+      <div class="avviso">
+        Asta in pausa{{ a.partecipante_disconnesso ? ' — in attesa di ' + a.partecipante_disconnesso.nome_squadra : '' }}…
+      </div>
+    } @else if (g) {
+      <div class="card">
+        <p class="ruolo">{{ g.ruolo_classico }}</p>
+        <h2>{{ g.nome }}</h2>
+        <p class="sottotitolo">{{ g.squadra_reale }} · Qt.A {{ g.quotazione_classica }} · FVM {{ g.fvm_classica }}</p>
+
+        <p class="offerta">{{ a.offerta_corrente ?? '—' }}</p>
+        <p class="sottotitolo">
+          @if (a.partecipante_in_testa) {
+            in testa: {{ a.partecipante_in_testa.nome_squadra }}
+          } @else {
+            nessun rilancio ancora
+          }
+        </p>
+
+        <p class="countdown">{{ countdownSecondi() ?? '—' }}</p>
+      </div>
+
+      @if (mioRilancioInAttesa()) {
+        <div class="avviso">In attesa di approvazione…</div>
+      } @else {
+        <div class="card">
+          <div class="rilanci-rapidi">
+            <button type="button" [disabled]="invioInCorso()" (click)="rilanciaRapido(1)">+1</button>
+            <button type="button" [disabled]="invioInCorso()" (click)="rilanciaRapido(5)">+5</button>
+            <button type="button" [disabled]="invioInCorso()" (click)="rilanciaRapido(10)">+10</button>
+          </div>
+          <div class="rilancio-manuale">
+            <input type="number" placeholder="Offerta libera" [(ngModel)]="importoManuale">
+            <button type="button" [disabled]="invioInCorso() || !importoManuale" (click)="rilanciaManuale()">Rilancia</button>
+          </div>
+          @if (erroreRilancio()) {
+            <p class="errore">{{ erroreRilancio() }}</p>
+          }
+        </div>
+      }
+    } @else {
+      <p class="stato-messaggio">Nessun giocatore in asta al momento.</p>
+    }
   </div>
 }

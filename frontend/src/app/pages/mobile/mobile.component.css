@@ -1,7 +1,10 @@
 .pagina {
   max-width: 480px;
   margin: 0 auto;
-  padding: 2.5rem 1.25rem;
+  padding: 1.5rem 1.25rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .stato-messaggio {
@@ -9,12 +12,106 @@
   color: var(--colore-testo-secondario);
 }
 
+.intestazione h1 {
+  margin-bottom: 0.35rem;
+}
+
 .crediti {
   color: var(--colore-accento);
   font-weight: 800;
   font-size: 1.3rem;
+  margin: 0;
+}
+
+.rosa-riga {
+  color: var(--colore-testo-secondario);
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0;
 }
 
 .sottotitolo {
   color: var(--colore-testo-secondario);
+}
+
+.card {
+  background: var(--colore-card);
+  border: 1px solid var(--colore-bordo);
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.ruolo {
+  color: var(--colore-testo-terziario);
+  font-weight: 800;
+  margin: 0;
+}
+
+.offerta {
+  color: var(--colore-accento);
+  font-weight: 800;
+  font-size: 2.5rem;
+  margin: 0.5rem 0;
+}
+
+.countdown {
+  font-weight: 800;
+  font-size: 3rem;
+  margin: 0.75rem 0 0;
+}
+
+.avviso {
+  border: 1px solid var(--colore-accento);
+  background: var(--colore-input);
+  padding: 1rem;
+  text-align: center;
+}
+
+.rilanci-rapidi {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.rilanci-rapidi button {
+  flex: 1;
+  background: var(--colore-accento);
+  color: var(--colore-testo-su-accento);
+  border: none;
+  padding: 1rem;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.rilanci-rapidi button:disabled {
+  opacity: 0.5;
+}
+
+.rilancio-manuale {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.rilancio-manuale input {
+  flex: 1;
+  background: var(--colore-input);
+  border: 1px solid var(--colore-bordo);
+  color: var(--colore-testo);
+  padding: 0.7rem;
+}
+
+.rilancio-manuale button {
+  background: var(--colore-input);
+  border: 1px solid var(--colore-accento);
+  color: var(--colore-accento);
+  padding: 0.7rem 1.25rem;
+  font-weight: 800;
+}
+
+.rilancio-manuale button:disabled {
+  opacity: 0.5;
+}
+
+.errore {
+  color: var(--colore-accento);
+  margin: 0.75rem 0 0;
 }
