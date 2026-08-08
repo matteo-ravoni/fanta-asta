@@ -1,0 +1,123 @@
+.pannello {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.card {
+  background: var(--colore-card);
+  border: 1px solid var(--colore-bordo);
+  padding: 1.25rem;
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  border-bottom: 2px solid var(--colore-bordo);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.card > button {
+  background: var(--colore-input);
+  border: 1px solid var(--colore-accento);
+  color: var(--colore-accento);
+  padding: 0.6rem 1rem;
+  font-weight: 700;
+}
+
+.errore {
+  color: var(--colore-accento);
+  border: 1px solid var(--colore-accento);
+  padding: 0.75rem 1rem;
+}
+
+.lista-assegnazioni {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.riga-assegnazione {
+  border-top: 1px solid var(--colore-bordo);
+  padding: 0.6rem 0;
+}
+
+.riga-principale {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pulsanti {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pulsanti button {
+  background: var(--colore-input);
+  border: 1px solid var(--colore-bordo);
+  color: var(--colore-testo);
+  padding: 0.4rem 0.9rem;
+  font-weight: 700;
+}
+
+.pulsanti button.pericolo {
+  border-color: var(--colore-accento);
+  color: var(--colore-accento);
+}
+
+.form-modifica {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.form-modifica select, .form-modifica input {
+  background: var(--colore-input);
+  border: 1px solid var(--colore-bordo);
+  color: var(--colore-testo);
+  padding: 0.4rem 0.6rem;
+}
+
+.form-modifica button {
+  padding: 0.4rem 0.9rem;
+  font-weight: 700;
+  border: 1px solid var(--colore-bordo);
+  background: var(--colore-input);
+  color: var(--colore-testo);
+}
+
+.form-modifica button.primario {
+  background: var(--colore-accento);
+  color: var(--colore-testo-su-accento);
+  border-color: var(--colore-accento);
+}
+
+.lista-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 260px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+.riga-log {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.3rem 0;
+  border-top: 1px solid var(--colore-bordo);
+}
+
+.log-timestamp {
+  color: var(--colore-testo-terziario);
+  white-space: nowrap;
+}
+
+.log-azione {
+  color: var(--colore-accento);
+  font-weight: 700;
+}

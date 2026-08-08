@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CollegamentoComponent } from '../collegamento/collegamento.component';
+import { AdminPanelComponent } from './admin-panel/admin-panel.component';
 import { SocketService } from '../../socket.service';
 
 interface Giocatore {
@@ -49,7 +50,7 @@ interface Configurazione {
 
 @Component({
   selector: 'app-stanza',
-  imports: [CollegamentoComponent],
+  imports: [CollegamentoComponent, AdminPanelComponent],
   templateUrl: './stanza.component.html',
   styleUrl: './stanza.component.css'
 })
@@ -63,6 +64,7 @@ export class StanzaComponent implements OnInit, OnDestroy {
   protected readonly countdownSecondi = signal<number | null>(null);
   protected readonly erroreAzione = signal<string | null>(null);
   protected readonly azioneInCorso = signal(false);
+  protected readonly pannelloAdminAperto = signal(false);
 
   private intervalloCountdown: ReturnType<typeof setInterval> | null = null;
 

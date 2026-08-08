@@ -1,7 +1,8 @@
 const express = require('express');
 
-function log(db, tipo_azione, dettagli) {
-    db.prepare('INSERT INTO log_admin (tipo_azione, dettagli) VALUES (?, ?)').run(tipo_azione, JSON.stringify(dettagli ?? {}));
+function log(db, tipo_azione, dettagli, riferimenti = {}) {
+    db.prepare('INSERT INTO log_admin (tipo_azione, giocatore_id, partecipante_id, dettagli) VALUES (?, ?, ?, ?)')
+        .run(tipo_azione, riferimenti.giocatore_id ?? null, riferimenti.partecipante_id ?? null, JSON.stringify(dettagli ?? {}));
 }
 
 // Determina lo slot totale/per-ruolo ancora liberi per un partecipante, in base al tipo di asta.
@@ -248,7 +249,7 @@ function creaRouter(getDb, io) {
             const nuovaScadenza = new Date(Date.now() + 5000).toISOString();
             db.prepare('UPDATE stato_asta SET offerta_corrente = ?, partecipante_in_testa_id = ?, countdown_scadenza = ? WHERE id = 1')
                 .run(offerta.importo, offerta.partecipante_id, nuovaScadenza);
-            log(db, 'accetta_rilancio', { offerta_id: offerta.id, giocatore_id: offerta.giocatore_id, partecipante_id: offerta.partecipante_id, importo: offerta.importo });
+            log(db, 'accetta_rilancio', { offerta_id: offerta.id, importo: offerta.importo }, { giocatore_id: offerta.giocatore_id, partecipante_id: offerta.partecipante_id });
         })();
 
         emettiStato(io, db);
@@ -283,7 +284,7 @@ function creaRouter(getDb, io) {
             db.prepare('INSERT INTO assegnazioni (giocatore_id, partecipante_id, prezzo) VALUES (?, ?, ?)').run(giocatoreId, partecipanteId, prezzo);
             db.prepare("UPDATE giocatori SET stato = 'assegnato' WHERE id = ?").run(giocatoreId);
             db.prepare('UPDATE partecipanti SET crediti_residui = crediti_residui - ? WHERE id = ?').run(prezzo, partecipanteId);
-            log(db, 'assegna', { giocatore_id: giocatoreId, partecipante_id: partecipanteId, prezzo });
+            log(db, 'assegna', { prezzo }, { giocatore_id: giocatoreId, partecipante_id: partecipanteId });
             db.prepare(`UPDATE stato_asta SET giocatore_corrente_id = NULL, offerta_corrente = NULL,
                 partecipante_in_testa_id = NULL, countdown_scadenza = NULL WHERE id = 1`).run();
             pickNextPlayer(db);
@@ -305,7 +306,7 @@ function creaRouter(getDb, io) {
             const { max } = db.prepare('SELECT COALESCE(MAX(ordine_saltato), 0) AS max FROM giocatori').get();
             db.prepare("UPDATE giocatori SET stato = 'saltato', ordine_saltato = ? WHERE id = ?").run(max + 1, giocatoreId);
             db.prepare("UPDATE offerte SET stato = 'rifiutata_host' WHERE giocatore_id = ? AND stato = 'in_attesa_host'").run(giocatoreId);
-            log(db, 'salta', { giocatore_id: giocatoreId });
+            log(db, 'salta', {}, { giocatore_id: giocatoreId });
             db.prepare(`UPDATE stato_asta SET giocatore_corrente_id = NULL, offerta_corrente = NULL,
                 partecipante_in_testa_id = NULL, countdown_scadenza = NULL WHERE id = 1`).run();
             pickNextPlayer(db);
@@ -347,7 +348,7 @@ function gestisciDisconnessione(db, io, partecipanteId) {
     if (stato.stato !== 'in_corso') return;
 
     db.prepare("UPDATE stato_asta SET stato = 'sospesa', partecipante_disconnesso_id = ? WHERE id = 1").run(partecipanteId);
-    log(db, 'sospendi', { motivo: 'disconnessione', partecipante_id: partecipanteId });
+    log(db, 'sospendi', { motivo: 'disconnessione' }, { partecipante_id: partecipanteId });
     emettiStato(io, db);
 }
 
@@ -355,9 +356,18 @@ function gestisciRiconnessione(db, io, partecipanteId) {
     const stato = db.prepare('SELECT stato, partecipante_disconnesso_id FROM stato_asta WHERE id = 1').get();
     if (stato.stato === 'sospesa' && stato.partecipante_disconnesso_id === partecipanteId) {
         db.prepare("UPDATE stato_asta SET stato = 'in_corso', partecipante_disconnesso_id = NULL WHERE id = 1").run();
-        log(db, 'riprendi', { motivo: 'riconnessione', partecipante_id: partecipanteId });
+        log(db, 'riprendi', { motivo: 'riconnessione' }, { partecipante_id: partecipanteId });
         emettiStato(io, db);
     }
 }
 
-module.exports = { creaRouter, gestisciDisconnessione, gestisciRiconnessione, calcolaSlotRimanenti, pickNextPlayer, caricaStatoCompleto };
+module.exports = {
+    creaRouter,
+    gestisciDisconnessione,
+    gestisciRiconnessione,
+    calcolaSlotRimanenti,
+    pickNextPlayer,
+    caricaStatoCompleto,
+    emettiStato,
+    log,
+};

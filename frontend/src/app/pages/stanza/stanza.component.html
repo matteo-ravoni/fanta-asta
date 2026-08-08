@@ -87,6 +87,13 @@
           </div>
         }
       </div>
+
+      <button type="button" class="link-admin" (click)="pannelloAdminAperto.set(!pannelloAdminAperto())">
+        {{ pannelloAdminAperto() ? 'Nascondi log & correzioni' : 'Log & correzioni' }}
+      </button>
+      @if (pannelloAdminAperto()) {
+        <app-admin-panel />
+      }
     </div>
   }
 }

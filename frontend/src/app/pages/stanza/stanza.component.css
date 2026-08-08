@@ -172,3 +172,14 @@
   color: var(--colore-accento);
   font-weight: 800;
 }
+
+.link-admin {
+  background: none;
+  border: none;
+  color: var(--colore-testo-secondario);
+  text-decoration: underline;
+  font-weight: 600;
+  padding: 0;
+  align-self: flex-start;
+  cursor: pointer;
+}

@@ -6,6 +6,7 @@ const { getDb } = require('./db');
 const configRouter = require('./config');
 const partecipantiRouter = require('./partecipanti');
 const auctionRouter = require('./auction');
+const adminRouter = require('./admin');
 const presenza = require('./presenza');
 
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api', configRouter.creaRouter(getDb));
 app.use('/api', partecipantiRouter.creaRouter(getDb, io));
 app.use('/api', auctionRouter.creaRouter(getDb, io));
+app.use('/api', adminRouter.creaRouter(getDb, io));
 
 app.use(express.static(PUBLIC_DIR));
 app.get('*', (req, res) => {

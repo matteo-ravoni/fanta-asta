@@ -1,0 +1,58 @@
+<div class="pannello">
+  @if (errore()) {
+    <p class="errore">{{ errore() }}</p>
+  }
+
+  <div class="card">
+    <h2>Correzioni</h2>
+    <button type="button" (click)="annullaUltima()">Annulla ultima assegnazione</button>
+
+    <div class="lista-assegnazioni">
+      @for (a of assegnazioni(); track a.id) {
+        <div class="riga-assegnazione">
+          <div class="riga-principale">
+            <span>{{ a.giocatore_nome }} ({{ a.ruolo_classico }}) — {{ a.nome_squadra }} — {{ a.prezzo }} crediti</span>
+            <span class="pulsanti">
+              <button type="button" (click)="apriModifica(a)">Modifica</button>
+              <button type="button" (click)="svincola(a)">Svincola</button>
+            </span>
+          </div>
+
+          @if (modificaApertaId() === a.id) {
+            <div class="form-modifica">
+              <select [(ngModel)]="nuovaSquadraId">
+                @for (p of partecipanti(); track p.id) {
+                  <option [value]="p.id">{{ p.nome_squadra }}</option>
+                }
+              </select>
+              <input type="number" [(ngModel)]="nuovoPrezzo">
+              <button type="button" class="primario" (click)="confermaModifica(a.id)">Conferma</button>
+              <button type="button" (click)="annullaModifica()">Annulla</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Reset</h2>
+    <div class="pulsanti">
+      <button type="button" (click)="resetRose()">Reset rose</button>
+      <button type="button" class="pericolo" (click)="resetCompleto()">Reset completo</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Log admin</h2>
+    <div class="lista-log">
+      @for (r of log(); track r.id) {
+        <div class="riga-log">
+          <span class="log-timestamp">{{ r.creato_il }}</span>
+          <span class="log-azione">{{ r.tipo_azione }}</span>
+          <span>{{ r.giocatore_nome }}{{ r.giocatore_nome && r.nome_squadra ? ' · ' : '' }}{{ r.nome_squadra }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>
