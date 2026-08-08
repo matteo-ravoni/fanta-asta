@@ -136,4 +136,9 @@ export class StanzaComponent implements OnInit, OnDestroy {
   protected rifiuta(rilancioId: number): void {
     this.eseguiAzione(`/api/rilanci/${rilancioId}/rifiuta`);
   }
+
+  protected chiudiAsta(): void {
+    if (!confirm("Chiudere l'asta ed esportare i file? L'operazione non è reversibile.")) return;
+    this.eseguiAzione('/api/asta/chiudi');
+  }
 }

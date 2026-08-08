@@ -7,6 +7,7 @@ const configRouter = require('./config');
 const partecipantiRouter = require('./partecipanti');
 const auctionRouter = require('./auction');
 const adminRouter = require('./admin');
+const exportRouter = require('./export');
 const presenza = require('./presenza');
 
 const PORT = process.env.PORT || 3000;
@@ -29,6 +30,7 @@ app.use('/api', configRouter.creaRouter(getDb));
 app.use('/api', partecipantiRouter.creaRouter(getDb, io));
 app.use('/api', auctionRouter.creaRouter(getDb, io));
 app.use('/api', adminRouter.creaRouter(getDb, io));
+app.use('/api', exportRouter.creaRouter(getDb, io));
 
 app.use(express.static(PUBLIC_DIR));
 app.get('*', (req, res) => {

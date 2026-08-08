@@ -173,6 +173,33 @@
   font-weight: 800;
 }
 
+.chiudi-asta {
+  align-self: flex-start;
+  background: var(--colore-input);
+  border: 1px solid var(--colore-accento);
+  color: var(--colore-accento);
+  padding: 0.75rem 1.25rem;
+  font-weight: 800;
+}
+
+.chiudi-asta:disabled {
+  opacity: 0.5;
+}
+
+.esportazioni .pulsanti {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.link-download {
+  background: var(--colore-accento);
+  color: var(--colore-testo-su-accento);
+  font-weight: 800;
+  padding: 0.65rem 1.1rem;
+  text-decoration: none;
+}
+
 .link-admin {
   background: none;
   border: none;

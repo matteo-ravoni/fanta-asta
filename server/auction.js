@@ -36,10 +36,13 @@ function calcolaSlotRimanenti(db, partecipanteId, configurazione) {
     };
 }
 
-// Sceglie il prossimo giocatore da mettere in asta (solo dal giro principale: la
-// riproposizione dei saltati a fine giro è responsabilità della tappa 10).
+// Sceglie il prossimo giocatore da mettere in asta: prima il giro principale (ordine_uscita),
+// poi la riproposizione dei saltati (ordine_saltato). Un giocatore saltato di nuovo torna in
+// fondo a questa seconda coda (vedi /asta/salta), così i cicli continuano finché non finiscono
+// o l'host chiude l'asta manualmente.
 function pickNextPlayer(db) {
-    const prossimo = db.prepare("SELECT id FROM giocatori WHERE stato = 'da_bandire' ORDER BY ordine_uscita LIMIT 1").get();
+    const prossimo = db.prepare("SELECT id FROM giocatori WHERE stato = 'da_bandire' ORDER BY ordine_uscita LIMIT 1").get()
+        ?? db.prepare("SELECT id FROM giocatori WHERE stato = 'saltato' ORDER BY ordine_saltato LIMIT 1").get();
     if (!prossimo) {
         db.prepare('UPDATE stato_asta SET giocatore_corrente_id = NULL WHERE id = 1').run();
         return null;

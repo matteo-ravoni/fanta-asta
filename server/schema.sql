@@ -148,7 +148,8 @@ CREATE TABLE log_admin (
                             'reset_completo',
                             'blocca_accessi',
                             'sblocca_accessi',
-                            'inizia_asta'
+                            'inizia_asta',
+                            'chiudi_asta'
                         )),
     giocatore_id        INTEGER REFERENCES giocatori(id),
     partecipante_id     INTEGER REFERENCES partecipanti(id),

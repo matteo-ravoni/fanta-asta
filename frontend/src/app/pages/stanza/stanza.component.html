@@ -31,6 +31,20 @@
         <p class="avviso">In attesa di {{ a.partecipante_disconnesso.nome_squadra }} (disconnesso)…</p>
       }
 
+      @if (a.stato === 'conclusa') {
+        <div class="card esportazioni">
+          <h2>Asta conclusa</h2>
+          <p class="sottotitolo">Dati congelati. File pronti per il download.</p>
+          <div class="pulsanti">
+            <a href="/api/export/rose.csv" download class="link-download">CSV rose</a>
+            <a href="/api/export/asta_completo.xlsx" download class="link-download">Excel completo</a>
+            <a href="/api/export/dump.json" download class="link-download">Dump JSON</a>
+          </div>
+        </div>
+      } @else {
+        <button type="button" class="chiudi-asta" [disabled]="azioneInCorso()" (click)="chiudiAsta()">Chiudi asta ed esporta</button>
+      }
+
       @if (g) {
         <div class="card giocatore">
           <p class="ruolo">{{ g.ruolo_classico === 'P' ? 'PORTIERE' : g.ruolo_classico === 'D' ? 'DIFENSORE' : g.ruolo_classico === 'C' ? 'CENTROCAMPISTA' : 'ATTACCANTE' }}</p>
