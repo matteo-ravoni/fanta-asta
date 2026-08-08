@@ -13,7 +13,8 @@ const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+// pingInterval + pingTimeout ~= 5s di silenzio prima che una disconnessione sia rilevata (spec sez. 4).
+const io = new Server(server, { pingInterval: 2000, pingTimeout: 3000 });
 
 app.use(express.json());
 
@@ -39,7 +40,8 @@ io.on('connection', (socket) => {
     let partecipanteIdCollegato = null;
 
     socket.on('identifica', ({ token } = {}) => {
-        const p = getDb().prepare('SELECT id FROM partecipanti WHERE token = ?').get(token);
+        const db = getDb();
+        const p = db.prepare('SELECT id FROM partecipanti WHERE token = ?').get(token);
         if (!p) {
             socket.emit('identifica:errore', { messaggio: 'Sessione non valida.' });
             return;
@@ -47,6 +49,7 @@ io.on('connection', (socket) => {
         partecipanteIdCollegato = p.id;
         presenza.connetti(p.id, socket.id);
         io.emit('partecipanti:aggiornati');
+        auctionRouter.gestisciRiconnessione(db, io, p.id);
     });
 
     socket.on('disconnect', () => {
@@ -56,6 +59,9 @@ io.on('connection', (socket) => {
         if (partecipanteIdCollegato !== null) {
             presenza.disconnetti(partecipanteIdCollegato, socket.id);
             io.emit('partecipanti:aggiornati');
+            if (!presenza.isConnesso(partecipanteIdCollegato)) {
+                auctionRouter.gestisciDisconnessione(getDb(), io, partecipanteIdCollegato);
+            }
         }
     });
 });

@@ -2,9 +2,58 @@
   max-width: 640px;
   margin: 0 auto;
   padding: 2rem 1.25rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .stato-messaggio {
   padding: 2rem 1.25rem;
+  color: var(--colore-testo-secondario);
+}
+
+.badge {
+  display: inline-block;
+  background: var(--colore-input);
+  border: 1px solid var(--colore-bordo);
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.avviso {
+  border: 1px solid var(--colore-accento);
+  background: var(--colore-input);
+  padding: 0.85rem 1rem;
+}
+
+.card {
+  background: var(--colore-card);
+  border: 1px solid var(--colore-bordo);
+  padding: 1.25rem;
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  border-bottom: 2px solid var(--colore-bordo);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.ruolo {
+  color: var(--colore-testo-terziario);
+  font-weight: 800;
+  margin: 0;
+}
+
+.offerta {
+  color: var(--colore-accento);
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+.sottotitolo {
   color: var(--colore-testo-secondario);
 }

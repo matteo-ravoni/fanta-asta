@@ -3,8 +3,25 @@ import { HttpClient } from '@angular/common/http';
 import { CollegamentoComponent } from '../collegamento/collegamento.component';
 import { SocketService } from '../../socket.service';
 
+interface Giocatore {
+  id: number;
+  nome: string;
+  squadra_reale: string;
+  ruolo_classico: string;
+  quotazione_classica: number;
+  fvm_classica: number | null;
+}
+
 interface StatoAsta {
   stato: 'non_iniziata' | 'in_corso' | 'sospesa' | 'conclusa';
+  giocatore_corrente: Giocatore | null;
+  offerta_corrente: number | null;
+  partecipante_in_testa: { id: number; nome_squadra: string } | null;
+  countdown_scadenza: string | null;
+  partecipante_disconnesso: { id: number; nome_squadra: string } | null;
+  rilanci_in_attesa: { id: number; importo: number; partecipante: { id: number; nome_squadra: string } }[];
+  rose: { id: number; nome_squadra: string; crediti_residui: number; ruoli: Record<string, number>; totale: number }[];
+  asta_esaurita: boolean;
 }
 
 @Component({
@@ -18,26 +35,25 @@ export class StanzaComponent implements OnInit, OnDestroy {
   private readonly socketService = inject(SocketService);
 
   protected readonly caricamento = signal(true);
-  protected readonly stato = signal<StatoAsta['stato'] | null>(null);
+  protected readonly asta = signal<StatoAsta | null>(null);
 
-  private readonly aggiorna = () => this.carica();
+  private readonly aggiorna = (payload: StatoAsta) => {
+    this.asta.set(payload);
+    this.caricamento.set(false);
+  };
 
   ngOnInit(): void {
-    this.carica();
-    this.socketService.on('stato_asta:aggiornato', this.aggiorna);
-  }
-
-  ngOnDestroy(): void {
-    this.socketService.off('stato_asta:aggiornato', this.aggiorna);
-  }
-
-  private carica(): void {
-    this.http.get<StatoAsta>('/api/stato').subscribe({
-      next: (s) => {
-        this.stato.set(s.stato);
+    this.http.get<StatoAsta>('/api/asta/stato').subscribe({
+      next: (a) => {
+        this.asta.set(a);
         this.caricamento.set(false);
       },
       error: () => this.caricamento.set(false),
     });
+    this.socketService.on('asta:stato', this.aggiorna);
+  }
+
+  ngOnDestroy(): void {
+    this.socketService.off('asta:stato', this.aggiorna);
   }
 }
