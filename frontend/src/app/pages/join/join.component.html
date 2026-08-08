@@ -1,0 +1,27 @@
+@if (caricamento()) {
+  <p class="stato-messaggio">Un attimo…</p>
+} @else {
+  <div class="pagina">
+    <h1>Chi sei?</h1>
+    <p class="sottotitolo">Scegli la tua squadra per entrare nell'asta.</p>
+
+    @if (accessiBloccati()) {
+      <p class="avviso">Gli accessi sono stati chiusi dall'host. Chiedigli di riaprirli per poter entrare.</p>
+    } @else {
+      <div class="lista-squadre">
+        @for (s of squadre(); track s.nome_squadra) {
+          <button type="button" class="squadra" [class.occupata]="s.occupata" [disabled]="s.occupata || inCorso()" (click)="scegli(s)">
+            {{ s.nome_squadra }}
+            @if (s.occupata) {
+              <span class="etichetta">già scelta</span>
+            }
+          </button>
+        }
+      </div>
+    }
+
+    @if (errore()) {
+      <p class="errore">{{ errore() }}</p>
+    }
+  </div>
+}

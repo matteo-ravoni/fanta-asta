@@ -1,0 +1,10 @@
+@if (caricamento()) {
+  <p class="stato-messaggio">Un attimo…</p>
+} @else if (stato() === 'non_iniziata') {
+  <app-collegamento />
+} @else {
+  <div class="pagina">
+    <h1>Si fa sul serio!</h1>
+    <p class="stato-messaggio">Dashboard dell'asta in arrivo nella prossima tappa (stato attuale: {{ stato() }}).</p>
+  </div>
+}

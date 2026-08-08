@@ -105,6 +105,23 @@ function creaRouter(getDb) {
         res.json(stato);
     });
 
+    router.get('/giocatori', (req, res) => {
+        const db = getDb();
+        const { ruolo, q } = req.query;
+        let sql = 'SELECT id, nome, squadra_reale, ruolo_classico, ruolo_mantra, quotazione_classica, quotazione_mantra, fvm_classica, fvm_mantra, stato FROM giocatori WHERE 1=1';
+        const parametri = [];
+        if (ruolo) {
+            sql += ' AND ruolo_classico = ?';
+            parametri.push(ruolo);
+        }
+        if (q) {
+            sql += ' AND nome LIKE ?';
+            parametri.push(`%${q}%`);
+        }
+        sql += ' ORDER BY ordine_uscita';
+        res.json(db.prepare(sql).all(...parametri));
+    });
+
     router.get('/configurazione', (req, res) => {
         const db = getDb();
         const configurazione = db.prepare('SELECT * FROM configurazione WHERE id = 1').get() ?? null;

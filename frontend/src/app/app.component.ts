@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SocketService } from './socket.service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +8,4 @@ import { SocketService } from './socket.service';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  protected readonly socketService = inject(SocketService);
 }

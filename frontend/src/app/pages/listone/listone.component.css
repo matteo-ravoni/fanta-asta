@@ -1,0 +1,76 @@
+.pagina {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.filtri {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.25rem 0;
+  flex-wrap: wrap;
+}
+
+.ruoli {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ruoli button {
+  background: var(--colore-card);
+  border: 1px solid var(--colore-bordo);
+  color: var(--colore-testo-secondario);
+  padding: 0.4rem 0.9rem;
+  font-weight: 600;
+}
+
+.ruoli button.attivo {
+  background: var(--colore-accento);
+  color: var(--colore-testo-su-accento);
+  border-color: var(--colore-accento);
+}
+
+input[type="search"] {
+  background: var(--colore-input);
+  border: 1px solid var(--colore-bordo);
+  color: var(--colore-testo);
+  padding: 0.5rem 0.75rem;
+  min-width: 220px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--colore-bordo);
+  font-size: 0.9rem;
+}
+
+th {
+  color: var(--colore-testo-terziario);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+tr.ceduto td {
+  text-decoration: line-through;
+  color: var(--colore-testo-terziario);
+}
+
+.ruolo {
+  padding: 0.15rem 0.5rem;
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
+.ruolo[data-ruolo="P"] { background: var(--colore-portiere-bg); color: var(--colore-portiere-testo); }
+.ruolo[data-ruolo="D"] { background: var(--colore-difensore-bg); color: var(--colore-difensore-testo); }
+.ruolo[data-ruolo="C"] { background: var(--colore-centrocampista-bg); color: var(--colore-centrocampista-testo); }
+.ruolo[data-ruolo="A"] { background: var(--colore-attaccante-bg); color: var(--colore-attaccante-testo); }

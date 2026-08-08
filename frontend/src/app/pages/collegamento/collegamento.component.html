@@ -1,0 +1,48 @@
+<div class="pagina">
+  <h1>Chi è a bordo?</h1>
+
+  @if (urlLocale) {
+    <p class="avviso">
+      Questa pagina è aperta da "localhost": il QR non funzionerà sugli altri dispositivi.
+      Apri questa pagina dall'indirizzo IP del laptop nella rete locale.
+    </p>
+  }
+
+  <div class="card riquadro-qr">
+    @if (qrDataUrl()) {
+      <img [src]="qrDataUrl()" alt="QR code per collegarsi" width="260" height="260">
+    }
+    <div class="url-riga">
+      <code>{{ url }}</code>
+      <button type="button" (click)="copiaUrl()">{{ copiato() ? 'Copiato!' : 'Copia' }}</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Partecipanti</h2>
+    <p class="contatore">{{ numeroCollegati() }}/{{ partecipanti().length }} collegati</p>
+    <ul class="lista-partecipanti">
+      @for (p of partecipanti(); track p.id) {
+        <li>
+          <span class="pallino" [class.verde]="p.connesso"></span>
+          {{ p.nome_squadra }}
+        </li>
+      }
+    </ul>
+  </div>
+
+  <div class="card">
+    <label class="toggle-riga">
+      <input type="checkbox" [checked]="accessiBloccati()" (change)="toggleBloccoAccessi()">
+      Blocca nuovi accessi
+    </label>
+
+    @if (erroreAzione()) {
+      <p class="errore">{{ erroreAzione() }}</p>
+    }
+
+    <button type="button" class="bottone-inizia" [disabled]="!accessiBloccati() || avvioInCorso()" (click)="iniziaAsta()">
+      {{ avvioInCorso() ? 'Avvio…' : 'Inizia asta' }}
+    </button>
+  </div>
+</div>

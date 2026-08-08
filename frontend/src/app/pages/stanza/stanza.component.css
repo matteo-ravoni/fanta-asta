@@ -1,0 +1,10 @@
+.pagina {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.stato-messaggio {
+  padding: 2rem 1.25rem;
+  color: var(--colore-testo-secondario);
+}

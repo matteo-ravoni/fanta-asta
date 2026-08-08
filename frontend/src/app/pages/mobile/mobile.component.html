@@ -1,0 +1,9 @@
+@if (caricamento()) {
+  <p class="stato-messaggio">Un attimo…</p>
+} @else if (partecipante()) {
+  <div class="pagina">
+    <h1>{{ partecipante()!.nome_squadra }}</h1>
+    <p class="crediti">{{ partecipante()!.crediti_residui }} crediti residui</p>
+    <p class="sottotitolo">Sei collegato. In attesa che l'host avvii l'asta — la schermata dei rilanci arriva nella prossima tappa.</p>
+  </div>
+}

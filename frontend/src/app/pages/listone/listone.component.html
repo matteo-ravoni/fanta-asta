@@ -1,0 +1,39 @@
+<div class="pagina">
+  <h1>Il listone</h1>
+
+  <div class="filtri">
+    <div class="ruoli">
+      @for (r of ruoli; track r) {
+        <button type="button" [class.attivo]="ruoloFiltro() === r" (click)="filtraRuolo(r)">{{ r || 'Tutti' }}</button>
+      }
+    </div>
+    <input type="search" placeholder="Cerca giocatore…" [(ngModel)]="ricerca" (ngModelChange)="cerca()">
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Squadra</th>
+        <th>R</th>
+        <th>RM</th>
+        <th>Qt.A</th>
+        <th>FVM</th>
+        <th>Stato</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (g of giocatori(); track g.id) {
+        <tr [class.ceduto]="g.stato === 'assegnato'">
+          <td>{{ g.nome }}</td>
+          <td>{{ g.squadra_reale }}</td>
+          <td><span class="ruolo" [attr.data-ruolo]="g.ruolo_classico">{{ g.ruolo_classico }}</span></td>
+          <td>{{ g.ruolo_mantra }}</td>
+          <td>{{ g.quotazione_classica }}</td>
+          <td>{{ g.fvm_classica }}</td>
+          <td>{{ g.stato }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
