@@ -74,16 +74,25 @@
 
 .rilanci-rapidi button {
   flex: 1;
-  background: var(--colore-accento);
-  color: var(--colore-testo-su-accento);
-  border: none;
+  background: var(--colore-input);
+  color: var(--colore-accento);
+  border: 1px solid var(--colore-accento);
   padding: 1rem;
   font-weight: 800;
   font-size: 1.1rem;
 }
 
+.rilanci-rapidi button.premuto {
+  background: var(--colore-accento);
+  color: var(--colore-testo-su-accento);
+}
+
 .rilanci-rapidi button:disabled {
   opacity: 0.5;
+}
+
+.rilanci-rapidi button.premuto:disabled {
+  opacity: 1;
 }
 
 .rilancio-manuale {
@@ -114,4 +123,41 @@
 .errore {
   color: var(--colore-accento);
   margin: 0.75rem 0 0;
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  border-bottom: 2px solid var(--colore-bordo);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.riga-acquisto {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: left;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--colore-bordo);
+  font-size: 0.9rem;
+}
+
+.riga-acquisto:first-of-type {
+  border-top: none;
+}
+
+.ruolo-badge {
+  padding: 0.1rem 0.4rem;
+  font-weight: 800;
+  font-size: 0.7rem;
+}
+
+.ruolo-badge[data-ruolo="P"] { background: var(--colore-portiere-bg); color: var(--colore-portiere-testo); }
+.ruolo-badge[data-ruolo="D"] { background: var(--colore-difensore-bg); color: var(--colore-difensore-testo); }
+.ruolo-badge[data-ruolo="C"] { background: var(--colore-centrocampista-bg); color: var(--colore-centrocampista-testo); }
+.ruolo-badge[data-ruolo="A"] { background: var(--colore-attaccante-bg); color: var(--colore-attaccante-testo); }
+
+.prezzo-acquisto {
+  margin-left: auto;
+  color: var(--colore-testo-secondario);
 }

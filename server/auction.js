@@ -1,5 +1,7 @@
 const express = require('express');
 
+const DURATA_COUNTDOWN_MS = 10000;
+
 function log(db, tipo_azione, dettagli, riferimenti = {}) {
     db.prepare('INSERT INTO log_admin (tipo_azione, giocatore_id, partecipante_id, dettagli) VALUES (?, ?, ?, ?)')
         .run(tipo_azione, riferimenti.giocatore_id ?? null, riferimenti.partecipante_id ?? null, JSON.stringify(dettagli ?? {}));
@@ -90,6 +92,11 @@ function caricaStatoCompleto(db) {
         FROM assegnazioni a JOIN giocatori g ON g.id = a.giocatore_id
         GROUP BY a.partecipante_id, g.ruolo_classico
     `).all();
+    const acquisti = db.prepare(`
+        SELECT a.partecipante_id, g.nome, g.ruolo_classico, a.prezzo
+        FROM assegnazioni a JOIN giocatori g ON g.id = a.giocatore_id
+        ORDER BY a.assegnato_il
+    `).all();
 
     const rose = partecipanti.map((p) => {
         const ruoli = { P: 0, D: 0, C: 0, A: 0 };
@@ -101,6 +108,9 @@ function caricaStatoCompleto(db) {
             crediti_residui: p.crediti_residui,
             ruoli,
             totale: ruoli.P + ruoli.D + ruoli.C + ruoli.A,
+            giocatori: acquisti
+                .filter((a) => a.partecipante_id === p.id)
+                .map((a) => ({ nome: a.nome, ruolo_classico: a.ruolo_classico, prezzo: a.prezzo })),
         };
     });
 
@@ -225,7 +235,7 @@ function creaRouter(getDb, io) {
             .run(stato.giocatore_corrente_id, partecipante.id, importo, nuovoStatoOfferta);
 
         if (!inZonaPostZero) {
-            const nuovaScadenza = new Date(ora + 5000).toISOString();
+            const nuovaScadenza = new Date(ora + DURATA_COUNTDOWN_MS).toISOString();
             db.prepare('UPDATE stato_asta SET offerta_corrente = ?, partecipante_in_testa_id = ?, countdown_scadenza = ? WHERE id = 1')
                 .run(importo, partecipante.id, nuovaScadenza);
         }
@@ -249,7 +259,7 @@ function creaRouter(getDb, io) {
             db.prepare("UPDATE offerte SET stato = 'accettata_host' WHERE id = ?").run(offerta.id);
             db.prepare("UPDATE offerte SET stato = 'rifiutata_host' WHERE giocatore_id = ? AND stato = 'in_attesa_host' AND importo <= ?")
                 .run(offerta.giocatore_id, offerta.importo);
-            const nuovaScadenza = new Date(Date.now() + 5000).toISOString();
+            const nuovaScadenza = new Date(Date.now() + DURATA_COUNTDOWN_MS).toISOString();
             db.prepare('UPDATE stato_asta SET offerta_corrente = ?, partecipante_in_testa_id = ?, countdown_scadenza = ? WHERE id = 1')
                 .run(offerta.importo, offerta.partecipante_id, nuovaScadenza);
             log(db, 'accetta_rilancio', { offerta_id: offerta.id, importo: offerta.importo }, { giocatore_id: offerta.giocatore_id, partecipante_id: offerta.partecipante_id });
@@ -346,28 +356,8 @@ function creaRouter(getDb, io) {
     return router;
 }
 
-function gestisciDisconnessione(db, io, partecipanteId) {
-    const stato = db.prepare('SELECT stato FROM stato_asta WHERE id = 1').get();
-    if (stato.stato !== 'in_corso') return;
-
-    db.prepare("UPDATE stato_asta SET stato = 'sospesa', partecipante_disconnesso_id = ? WHERE id = 1").run(partecipanteId);
-    log(db, 'sospendi', { motivo: 'disconnessione' }, { partecipante_id: partecipanteId });
-    emettiStato(io, db);
-}
-
-function gestisciRiconnessione(db, io, partecipanteId) {
-    const stato = db.prepare('SELECT stato, partecipante_disconnesso_id FROM stato_asta WHERE id = 1').get();
-    if (stato.stato === 'sospesa' && stato.partecipante_disconnesso_id === partecipanteId) {
-        db.prepare("UPDATE stato_asta SET stato = 'in_corso', partecipante_disconnesso_id = NULL WHERE id = 1").run();
-        log(db, 'riprendi', { motivo: 'riconnessione' }, { partecipante_id: partecipanteId });
-        emettiStato(io, db);
-    }
-}
-
 module.exports = {
     creaRouter,
-    gestisciDisconnessione,
-    gestisciRiconnessione,
     calcolaSlotRimanenti,
     pickNextPlayer,
     caricaStatoCompleto,

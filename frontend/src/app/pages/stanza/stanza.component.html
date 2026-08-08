@@ -88,15 +88,32 @@
       <div class="card">
         <h2>Squadre</h2>
         @for (s of a.rose; track s.id) {
-          <div class="riga-squadra">
-            <span>{{ s.nome_squadra }}</span>
-            <span class="crediti-squadra">{{ s.crediti_residui }}</span>
-            @if (configurazione(); as cfg) {
-              @if (a.tipo_asta === 'classica') {
-                <span class="sottotitolo">P {{ s.ruoli['P'] }}/{{ cfg.slot_portieri }} · D {{ s.ruoli['D'] }}/{{ cfg.slot_difensori }} · C {{ s.ruoli['C'] }}/{{ cfg.slot_centrocampisti }} · A {{ s.ruoli['A'] }}/{{ cfg.slot_attaccanti }}</span>
-              } @else {
-                <span class="sottotitolo">{{ s.totale }}/{{ cfg.slot_totale_mantra }} giocatori · {{ s.ruoli['P'] }}/{{ cfg.slot_portieri }} portieri</span>
+          <div class="blocco-squadra">
+            <button type="button" class="riga-squadra" (click)="toggleSquadra(s.id)">
+              <span>{{ squadreEspanse().has(s.id) ? '▾' : '▸' }} {{ s.nome_squadra }}</span>
+              <span class="crediti-squadra">{{ s.crediti_residui }}</span>
+              @if (configurazione(); as cfg) {
+                @if (a.tipo_asta === 'classica') {
+                  <span class="sottotitolo">P {{ s.ruoli['P'] }}/{{ cfg.slot_portieri }} · D {{ s.ruoli['D'] }}/{{ cfg.slot_difensori }} · C {{ s.ruoli['C'] }}/{{ cfg.slot_centrocampisti }} · A {{ s.ruoli['A'] }}/{{ cfg.slot_attaccanti }}</span>
+                } @else {
+                  <span class="sottotitolo">{{ s.totale }}/{{ cfg.slot_totale_mantra }} giocatori · {{ s.ruoli['P'] }}/{{ cfg.slot_portieri }} portieri</span>
+                }
               }
+            </button>
+            @if (squadreEspanse().has(s.id)) {
+              <div class="lista-acquisti">
+                @if (s.giocatori.length === 0) {
+                  <p class="sottotitolo">Nessun giocatore acquistato.</p>
+                } @else {
+                  @for (g of s.giocatori; track g.nome) {
+                    <div class="riga-acquisto">
+                      <span class="ruolo" [attr.data-ruolo]="g.ruolo_classico">{{ g.ruolo_classico }}</span>
+                      <span>{{ g.nome }}</span>
+                      <span class="prezzo-acquisto">{{ g.prezzo }}</span>
+                    </div>
+                  }
+                }
+              </div>
             }
           </div>
         }

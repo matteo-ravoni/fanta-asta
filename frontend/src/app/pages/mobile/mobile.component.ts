@@ -14,12 +14,19 @@ interface Giocatore {
   fvm_classica: number | null;
 }
 
+interface GiocatoreAcquistato {
+  nome: string;
+  ruolo_classico: string;
+  prezzo: number;
+}
+
 interface Rosa {
   id: number;
   nome_squadra: string;
   crediti_residui: number;
   ruoli: Record<string, number>;
   totale: number;
+  giocatori: GiocatoreAcquistato[];
 }
 
 interface StatoAsta {
@@ -61,6 +68,7 @@ export class MobileComponent implements OnInit, OnDestroy {
   protected readonly countdownSecondi = signal<number | null>(null);
   protected readonly erroreRilancio = signal<string | null>(null);
   protected readonly invioInCorso = signal(false);
+  protected readonly deltaInCorso = signal<number | null>(null);
   protected importoManuale: number | null = null;
 
   private intervalloCountdown: ReturnType<typeof setInterval> | null = null;
@@ -97,7 +105,7 @@ export class MobileComponent implements OnInit, OnDestroy {
         this.countdownSecondi.set(null);
         return;
       }
-      const restanti = Math.ceil((new Date(scadenza).getTime() - Date.now()) / 1000);
+      const restanti = Math.ceil((new Date(scadenza).getTime() - this.socketService.oraServer()) / 1000);
       this.countdownSecondi.set(Math.max(0, restanti));
     }, 200);
   }
@@ -109,6 +117,7 @@ export class MobileComponent implements OnInit, OnDestroy {
 
   protected rilanciaRapido(delta: number): void {
     const base = this.asta()?.offerta_corrente ?? 0;
+    this.deltaInCorso.set(delta);
     this.rilancia(base + delta);
   }
 
@@ -122,11 +131,13 @@ export class MobileComponent implements OnInit, OnDestroy {
     this.http.post<{ ok: true; stato: string }>('/api/rilancio', { token: this.sessione.getToken(), importo }).subscribe({
       next: () => {
         this.invioInCorso.set(false);
+        this.deltaInCorso.set(null);
         this.importoManuale = null;
       },
       error: (err) => {
         this.erroreRilancio.set(err.error?.errori?.[0] ?? 'Errore imprevisto.');
         this.invioInCorso.set(false);
+        this.deltaInCorso.set(null);
       },
     });
   }

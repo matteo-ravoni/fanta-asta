@@ -19,12 +19,19 @@ interface RilancioInAttesa {
   partecipante: { id: number; nome_squadra: string };
 }
 
+interface GiocatoreAcquistato {
+  nome: string;
+  ruolo_classico: string;
+  prezzo: number;
+}
+
 interface Rosa {
   id: number;
   nome_squadra: string;
   crediti_residui: number;
   ruoli: Record<string, number>;
   totale: number;
+  giocatori: GiocatoreAcquistato[];
 }
 
 interface StatoAsta {
@@ -65,6 +72,7 @@ export class StanzaComponent implements OnInit, OnDestroy {
   protected readonly erroreAzione = signal<string | null>(null);
   protected readonly azioneInCorso = signal(false);
   protected readonly pannelloAdminAperto = signal(false);
+  protected readonly squadreEspanse = signal<Set<number>>(new Set());
 
   private intervalloCountdown: ReturnType<typeof setInterval> | null = null;
 
@@ -91,7 +99,7 @@ export class StanzaComponent implements OnInit, OnDestroy {
         this.countdownSecondi.set(null);
         return;
       }
-      const restanti = Math.ceil((new Date(scadenza).getTime() - Date.now()) / 1000);
+      const restanti = Math.ceil((new Date(scadenza).getTime() - this.socketService.oraServer()) / 1000);
       this.countdownSecondi.set(Math.max(0, restanti));
     }, 200);
   }
@@ -135,6 +143,16 @@ export class StanzaComponent implements OnInit, OnDestroy {
 
   protected rifiuta(rilancioId: number): void {
     this.eseguiAzione(`/api/rilanci/${rilancioId}/rifiuta`);
+  }
+
+  protected toggleSquadra(partecipanteId: number): void {
+    const aggiornato = new Set(this.squadreEspanse());
+    if (aggiornato.has(partecipanteId)) {
+      aggiornato.delete(partecipanteId);
+    } else {
+      aggiornato.add(partecipanteId);
+    }
+    this.squadreEspanse.set(aggiornato);
   }
 
   protected chiudiAsta(): void {

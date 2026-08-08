@@ -45,9 +45,9 @@
       } @else {
         <div class="card">
           <div class="rilanci-rapidi">
-            <button type="button" [disabled]="invioInCorso()" (click)="rilanciaRapido(1)">+1</button>
-            <button type="button" [disabled]="invioInCorso()" (click)="rilanciaRapido(5)">+5</button>
-            <button type="button" [disabled]="invioInCorso()" (click)="rilanciaRapido(10)">+10</button>
+            <button type="button" [class.premuto]="deltaInCorso() === 1" [disabled]="invioInCorso()" (click)="rilanciaRapido(1)">{{ deltaInCorso() === 1 ? '…' : '+1' }}</button>
+            <button type="button" [class.premuto]="deltaInCorso() === 5" [disabled]="invioInCorso()" (click)="rilanciaRapido(5)">{{ deltaInCorso() === 5 ? '…' : '+5' }}</button>
+            <button type="button" [class.premuto]="deltaInCorso() === 10" [disabled]="invioInCorso()" (click)="rilanciaRapido(10)">{{ deltaInCorso() === 10 ? '…' : '+10' }}</button>
           </div>
           <div class="rilancio-manuale">
             <input type="number" placeholder="Offerta libera" [(ngModel)]="importoManuale">
@@ -60,6 +60,23 @@
       }
     } @else {
       <p class="stato-messaggio">Nessun giocatore in asta al momento.</p>
+    }
+
+    @if (mia) {
+      <div class="card">
+        <h2>La mia rosa</h2>
+        @if (mia.giocatori.length === 0) {
+          <p class="sottotitolo">Non hai ancora acquistato nessun giocatore.</p>
+        } @else {
+          @for (giocatore of mia.giocatori; track giocatore.nome) {
+            <div class="riga-acquisto">
+              <span class="ruolo-badge" [attr.data-ruolo]="giocatore.ruolo_classico">{{ giocatore.ruolo_classico }}</span>
+              <span>{{ giocatore.nome }}</span>
+              <span class="prezzo-acquisto">{{ giocatore.prezzo }}</span>
+            </div>
+          }
+        }
+      </div>
     }
   </div>
 }

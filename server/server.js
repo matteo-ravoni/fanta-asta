@@ -15,7 +15,10 @@ const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
 const app = express();
 const server = http.createServer(app);
-// pingInterval + pingTimeout ~= 5s di silenzio prima che una disconnessione sia rilevata (spec sez. 4).
+// pingInterval + pingTimeout ~= 5s: solo per l'indicatore "connesso/in attesa" nella pagina di
+// collegamento. Non mette mai in pausa l'asta: bloccare lo schermo del telefono fa perdere la
+// connessione quasi subito, e mettere l'asta in pausa ad ogni blocco schermo sarebbe fastidioso
+// per tutti gli altri partecipanti.
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 3000 });
 
 app.use(express.json());
@@ -53,7 +56,13 @@ io.on('connection', (socket) => {
         partecipanteIdCollegato = p.id;
         presenza.connetti(p.id, socket.id);
         io.emit('partecipanti:aggiornati');
-        auctionRouter.gestisciRiconnessione(db, io, p.id);
+    });
+
+    // Sincronizzazione oraria: i client sono spesso su rete WiFi isolata senza internet,
+    // quindi senza NTP. Il countdown va confrontato con l'ora del server, non con l'orologio
+    // (potenzialmente disallineato) del dispositivo.
+    socket.on('ping-tempo', (_datiClient, callback) => {
+        if (typeof callback === 'function') callback(Date.now());
     });
 
     socket.on('disconnect', () => {
@@ -63,9 +72,6 @@ io.on('connection', (socket) => {
         if (partecipanteIdCollegato !== null) {
             presenza.disconnetti(partecipanteIdCollegato, socket.id);
             io.emit('partecipanti:aggiornati');
-            if (!presenza.isConnesso(partecipanteIdCollegato)) {
-                auctionRouter.gestisciDisconnessione(getDb(), io, partecipanteIdCollegato);
-            }
         }
     });
 });
