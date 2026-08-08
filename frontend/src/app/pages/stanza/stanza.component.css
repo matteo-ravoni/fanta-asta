@@ -1,5 +1,5 @@
 .pagina {
-  max-width: 640px;
+  max-width: 720px;
   margin: 0 auto;
   padding: 2rem 1.25rem 4rem;
   display: flex;
@@ -12,6 +12,14 @@
   color: var(--colore-testo-secondario);
 }
 
+.intestazione {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .badge {
   display: inline-block;
   background: var(--colore-input);
@@ -20,13 +28,41 @@
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.05em;
-  width: fit-content;
+  margin-top: 0.5rem;
 }
 
-.avviso {
+.azioni {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.azioni button {
+  background: var(--colore-card);
+  border: 1px solid var(--colore-bordo);
+  color: var(--colore-testo);
+  padding: 0.65rem 1.1rem;
+  font-weight: 800;
+}
+
+.azioni button.primario {
+  background: var(--colore-accento);
+  color: var(--colore-testo-su-accento);
+  border-color: var(--colore-accento);
+}
+
+.azioni button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.avviso, .errore {
   border: 1px solid var(--colore-accento);
   background: var(--colore-input);
   padding: 0.85rem 1rem;
+}
+
+.errore {
+  color: var(--colore-accento);
 }
 
 .card {
@@ -42,18 +78,97 @@
   margin-bottom: 0.75rem;
 }
 
+.giocatore {
+  text-align: center;
+}
+
 .ruolo {
   color: var(--colore-testo-terziario);
   font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.sottotitolo {
+  color: var(--colore-testo-secondario);
+  font-size: 0.9rem;
+}
+
+.riga-offerta {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin: 1.25rem 0;
+}
+
+.etichetta {
+  color: var(--colore-testo-terziario);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   margin: 0;
 }
 
 .offerta {
   color: var(--colore-accento);
   font-weight: 800;
-  font-size: 1.3rem;
+  font-size: 2rem;
+  margin: 0.15rem 0 0;
 }
 
-.sottotitolo {
-  color: var(--colore-testo-secondario);
+.in-testa {
+  font-weight: 800;
+  font-size: 1.3rem;
+  margin: 0.15rem 0 0;
+}
+
+.countdown {
+  font-weight: 800;
+  font-size: 3rem;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.riga-rilancio {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--colore-bordo);
+}
+
+.pulsanti-rilancio {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pulsanti-rilancio button {
+  background: var(--colore-input);
+  border: 1px solid var(--colore-bordo);
+  color: var(--colore-testo);
+  padding: 0.4rem 0.9rem;
+  font-weight: 700;
+}
+
+.pulsanti-rilancio button.primario {
+  background: var(--colore-accento);
+  color: var(--colore-testo-su-accento);
+  border-color: var(--colore-accento);
+}
+
+.riga-squadra {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--colore-bordo);
+  flex-wrap: wrap;
+}
+
+.riga-squadra:first-of-type {
+  border-top: none;
+}
+
+.crediti-squadra {
+  color: var(--colore-accento);
+  font-weight: 800;
 }

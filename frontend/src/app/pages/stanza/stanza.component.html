@@ -5,31 +5,65 @@
   @if (a.stato === 'non_iniziata') {
     <app-collegamento />
   } @else {
+    @let g = a.giocatore_corrente;
     <div class="pagina">
-      <h1>Si fa sul serio!</h1>
-      <p class="badge">{{ a.stato === 'sospesa' ? 'SOSPESA' : (a.stato === 'conclusa' ? 'CONCLUSA' : 'IN CORSO') }}</p>
+      <div class="intestazione">
+        <div>
+          <h1>Si fa sul serio!</h1>
+          <p class="badge">{{ a.stato === 'sospesa' ? 'SOSPESA' : (a.stato === 'conclusa' ? 'CONCLUSA' : 'IN CORSO') }}</p>
+        </div>
+        <div class="azioni">
+          <button type="button" [disabled]="a.stato !== 'in_corso' || azioneInCorso()" (click)="salta()">Salta</button>
+          @if (a.stato === 'sospesa') {
+            <button type="button" [disabled]="azioneInCorso()" (click)="riprendi()">Riprendi</button>
+          } @else {
+            <button type="button" [disabled]="a.stato !== 'in_corso' || azioneInCorso()" (click)="sospendi()">Sospendi</button>
+          }
+          <button type="button" class="primario" [disabled]="a.stato !== 'in_corso' || a.offerta_corrente === null || azioneInCorso()" (click)="assegna()">Assegna</button>
+        </div>
+      </div>
+
+      @if (erroreAzione()) {
+        <p class="errore">{{ erroreAzione() }}</p>
+      }
 
       @if (a.partecipante_disconnesso) {
         <p class="avviso">In attesa di {{ a.partecipante_disconnesso.nome_squadra }} (disconnesso)…</p>
       }
 
-      @if (a.giocatore_corrente; as g) {
-        <div class="card">
-          <p class="ruolo">{{ g.ruolo_classico }}</p>
+      @if (g) {
+        <div class="card giocatore">
+          <p class="ruolo">{{ g.ruolo_classico === 'P' ? 'PORTIERE' : g.ruolo_classico === 'D' ? 'DIFENSORE' : g.ruolo_classico === 'C' ? 'CENTROCAMPISTA' : 'ATTACCANTE' }}</p>
           <h2>{{ g.nome }}</h2>
           <p class="sottotitolo">{{ g.squadra_reale }} · Qt.A {{ g.quotazione_classica }} · FVM {{ g.fvm_classica }}</p>
-          <p class="offerta">Offerta attuale: {{ a.offerta_corrente ?? '—' }}</p>
-          @if (a.partecipante_in_testa) {
-            <p class="sottotitolo">In testa: {{ a.partecipante_in_testa.nome_squadra }}</p>
-          }
-          <p class="sottotitolo">Countdown: {{ a.countdown_scadenza ?? 'non ancora partito' }}</p>
+
+          <div class="riga-offerta">
+            <div>
+              <p class="etichetta">OFFERTA ATTUALE</p>
+              <p class="offerta">{{ a.offerta_corrente ?? '—' }}</p>
+            </div>
+            <div>
+              <p class="etichetta">IN TESTA</p>
+              <p class="in-testa">{{ a.partecipante_in_testa?.nome_squadra ?? '—' }}</p>
+            </div>
+          </div>
+
+          <p class="countdown">{{ countdownSecondi() ?? '—' }}</p>
+          <p class="sottotitolo">Countdown informativo — solo "Assegna" chiude l'asta</p>
         </div>
 
         @if (a.rilanci_in_attesa.length > 0) {
           <div class="card">
             <h2>Rilanci in attesa di approvazione</h2>
+            <p class="sottotitolo">Arrivati dopo lo zero del countdown — l'host decide uno per uno. Nessuna lista "prossimi": il giocatore successivo si scopre solo cliccando Salta.</p>
             @for (r of a.rilanci_in_attesa; track r.id) {
-              <p>{{ r.partecipante.nome_squadra }} offre {{ r.importo }}</p>
+              <div class="riga-rilancio">
+                <span>{{ r.partecipante.nome_squadra }} offre {{ r.importo }} crediti</span>
+                <span class="pulsanti-rilancio">
+                  <button type="button" [disabled]="azioneInCorso()" (click)="rifiuta(r.id)">Rifiuta</button>
+                  <button type="button" class="primario" [disabled]="azioneInCorso()" (click)="accetta(r.id)">Accetta</button>
+                </span>
+              </div>
             }
           </div>
         }
@@ -40,11 +74,19 @@
       <div class="card">
         <h2>Squadre</h2>
         @for (s of a.rose; track s.id) {
-          <p>{{ s.nome_squadra }} — {{ s.crediti_residui }} crediti — P {{ s.ruoli['P'] }} · D {{ s.ruoli['D'] }} · C {{ s.ruoli['C'] }} · A {{ s.ruoli['A'] }}</p>
+          <div class="riga-squadra">
+            <span>{{ s.nome_squadra }}</span>
+            <span class="crediti-squadra">{{ s.crediti_residui }}</span>
+            @if (configurazione(); as cfg) {
+              @if (a.tipo_asta === 'classica') {
+                <span class="sottotitolo">P {{ s.ruoli['P'] }}/{{ cfg.slot_portieri }} · D {{ s.ruoli['D'] }}/{{ cfg.slot_difensori }} · C {{ s.ruoli['C'] }}/{{ cfg.slot_centrocampisti }} · A {{ s.ruoli['A'] }}/{{ cfg.slot_attaccanti }}</span>
+              } @else {
+                <span class="sottotitolo">{{ s.totale }}/{{ cfg.slot_totale_mantra }} giocatori · {{ s.ruoli['P'] }}/{{ cfg.slot_portieri }} portieri</span>
+              }
+            }
+          </div>
         }
       </div>
-
-      <p class="sottotitolo">Dashboard completa (pulsanti Assegna/Salta/Sospendi, storico) in arrivo nella prossima tappa.</p>
     </div>
   }
 }
