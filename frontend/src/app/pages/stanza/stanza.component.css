@@ -1,7 +1,16 @@
 .pagina {
-  max-width: 720px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem 1.25rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.colonna-centrale {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -155,27 +164,35 @@
   border-color: var(--colore-accento);
 }
 
-.blocco-squadra {
-  border-top: 1px solid var(--colore-bordo);
+.sezione-squadre h2 {
+  font-size: 1.1rem;
+  border-bottom: 2px solid var(--colore-bordo);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
-.blocco-squadra:first-of-type {
-  border-top: none;
+.griglia-squadre {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  align-items: start;
 }
 
-.riga-squadra {
+.colonna-squadra {
+  background: var(--colore-card);
+  border: 1px solid var(--colore-bordo);
+  padding: 1rem;
+}
+
+.intestazione-colonna {
   display: flex;
   align-items: baseline;
+  justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.4rem 0;
-  flex-wrap: wrap;
-  width: 100%;
-  background: none;
-  border: none;
-  color: var(--colore-testo);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
+}
+
+.nome-squadra {
+  font-weight: 800;
 }
 
 .crediti-squadra {
@@ -187,7 +204,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  padding: 0 0 0.75rem 1.25rem;
+  padding-top: 0.6rem;
 }
 
 .riga-acquisto {

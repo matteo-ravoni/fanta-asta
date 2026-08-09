@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { SocketService } from '../../../socket.service';
@@ -8,6 +8,7 @@ interface Assegnazione {
   giocatore_id: number;
   giocatore_nome: string;
   ruolo_classico: string;
+  ruolo_mantra: string;
   partecipante_id: number;
   nome_squadra: string;
   prezzo: number;
@@ -37,6 +38,8 @@ interface Partecipante {
 export class AdminPanelComponent implements OnInit, OnDestroy {
   private readonly http = inject(HttpClient);
   private readonly socketService = inject(SocketService);
+
+  @Input() tipoAsta: 'classica' | 'mantra' | null = null;
 
   protected readonly assegnazioni = signal<Assegnazione[]>([]);
   protected readonly log = signal<LogRiga[]>([]);

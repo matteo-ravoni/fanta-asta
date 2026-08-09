@@ -10,6 +10,7 @@ interface Giocatore {
   nome: string;
   squadra_reale: string;
   ruolo_classico: string;
+  ruolo_mantra: string;
   quotazione_classica: number;
   fvm_classica: number | null;
 }
@@ -17,6 +18,7 @@ interface Giocatore {
 interface GiocatoreAcquistato {
   nome: string;
   ruolo_classico: string;
+  ruolo_mantra: string;
   prezzo: number;
 }
 
@@ -36,7 +38,11 @@ interface StatoAsta {
   partecipante_in_testa: { id: number; nome_squadra: string } | null;
   countdown_scadenza: string | null;
   partecipante_disconnesso: { id: number; nome_squadra: string } | null;
-  rilanci_in_attesa: { id: number; importo: number; partecipante: { id: number; nome_squadra: string } }[];
+  rilanci_in_attesa: {
+    id: number;
+    importo: number;
+    partecipante: { id: number; nome_squadra: string };
+  }[];
   rose: Rosa[];
   tipo_asta: 'classica' | 'mantra' | null;
 }
@@ -53,7 +59,7 @@ interface Configurazione {
   selector: 'app-mobile',
   imports: [FormsModule],
   templateUrl: './mobile.component.html',
-  styleUrl: './mobile.component.css'
+  styleUrl: './mobile.component.css',
 })
 export class MobileComponent implements OnInit, OnDestroy {
   private readonly http = inject(HttpClient);
@@ -78,10 +84,13 @@ export class MobileComponent implements OnInit, OnDestroy {
     this.erroreRilancio.set(null);
   };
 
-  protected readonly miaRosa = () => this.asta()?.rose.find((r) => r.id === this.partecipante()?.id) ?? null;
+  protected readonly miaRosa = () =>
+    this.asta()?.rose.find((r) => r.id === this.partecipante()?.id) ?? null;
 
   protected readonly mioRilancioInAttesa = () =>
-    this.asta()?.rilanci_in_attesa.some((r) => r.partecipante.id === this.partecipante()?.id) ?? false;
+    this.asta()?.rilanci_in_attesa.some(
+      (r) => r.partecipante.id === this.partecipante()?.id,
+    ) ?? false;
 
   ngOnInit(): void {
     this.sessione.verificaToken().subscribe((p) => {
@@ -92,8 +101,12 @@ export class MobileComponent implements OnInit, OnDestroy {
       this.partecipante.set(p);
       this.socketService.identifica(this.sessione.getToken()!);
 
-      this.http.get<StatoAsta>('/api/asta/stato').subscribe((a) => this.asta.set(a));
-      this.http.get<{ configurazione: Configurazione }>('/api/configurazione').subscribe((r) => this.configurazione.set(r.configurazione));
+      this.http
+        .get<StatoAsta>('/api/asta/stato')
+        .subscribe((a) => this.asta.set(a));
+      this.http
+        .get<{ configurazione: Configurazione }>('/api/configurazione')
+        .subscribe((r) => this.configurazione.set(r.configurazione));
       this.socketService.on('asta:stato', this.aggiornaAsta);
 
       this.caricamento.set(false);
@@ -105,7 +118,9 @@ export class MobileComponent implements OnInit, OnDestroy {
         this.countdownSecondi.set(null);
         return;
       }
-      const restanti = Math.ceil((new Date(scadenza).getTime() - this.socketService.oraServer()) / 1000);
+      const restanti = Math.ceil(
+        (new Date(scadenza).getTime() - this.socketService.oraServer()) / 1000,
+      );
       this.countdownSecondi.set(Math.max(0, restanti));
     }, 200);
   }
@@ -128,17 +143,24 @@ export class MobileComponent implements OnInit, OnDestroy {
   private rilancia(importo: number): void {
     this.erroreRilancio.set(null);
     this.invioInCorso.set(true);
-    this.http.post<{ ok: true; stato: string }>('/api/rilancio', { token: this.sessione.getToken(), importo }).subscribe({
-      next: () => {
-        this.invioInCorso.set(false);
-        this.deltaInCorso.set(null);
-        this.importoManuale = null;
-      },
-      error: (err) => {
-        this.erroreRilancio.set(err.error?.errori?.[0] ?? 'Errore imprevisto.');
-        this.invioInCorso.set(false);
-        this.deltaInCorso.set(null);
-      },
-    });
+    this.http
+      .post<{
+        ok: true;
+        stato: string;
+      }>('/api/rilancio', { token: this.sessione.getToken(), importo })
+      .subscribe({
+        next: () => {
+          this.invioInCorso.set(false);
+          this.deltaInCorso.set(null);
+          this.importoManuale = null;
+        },
+        error: (err) => {
+          this.erroreRilancio.set(
+            err.error?.errori?.[0] ?? 'Errore imprevisto.',
+          );
+          this.invioInCorso.set(false);
+          this.deltaInCorso.set(null);
+        },
+      });
   }
 }

@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const XLSX = require('xlsx');
-const { emettiStato, log } = require('./auction');
+const { emettiStato, log, calcolaSlotRimanenti } = require('./auction');
 
 const EXPORT_DIR = path.join(__dirname, '..', 'data', 'export');
 
@@ -71,6 +71,17 @@ function creaRouter(getDb, io) {
         const stato = db.prepare('SELECT stato FROM stato_asta WHERE id = 1').get();
         if (stato.stato !== 'in_corso' && stato.stato !== 'sospesa') {
             return res.status(403).json({ errori: ["L'asta non è attiva."] });
+        }
+
+        const configurazione = db.prepare('SELECT * FROM configurazione WHERE id = 1').get();
+        const partecipanti = db.prepare('SELECT id, nome_squadra FROM partecipanti ORDER BY ordine').all();
+        const squadreIncomplete = partecipanti
+            .filter((p) => calcolaSlotRimanenti(db, p.id, configurazione).totale > 0)
+            .map((p) => p.nome_squadra);
+        if (squadreIncomplete.length > 0) {
+            return res.status(403).json({
+                errori: [`Rose incomplete, impossibile chiudere l'asta: ${squadreIncomplete.join(', ')}.`],
+            });
         }
 
         db.prepare("UPDATE stato_asta SET stato = 'conclusa' WHERE id = 1").run();

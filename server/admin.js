@@ -19,7 +19,7 @@ function creaRouter(getDb, io) {
     router.get('/assegnazioni', (req, res) => {
         const righe = getDb().prepare(`
             SELECT a.id, a.prezzo, a.assegnato_il,
-                g.id AS giocatore_id, g.nome AS giocatore_nome, g.ruolo_classico,
+                g.id AS giocatore_id, g.nome AS giocatore_nome, g.ruolo_classico, g.ruolo_mantra,
                 p.id AS partecipante_id, p.nome_squadra
             FROM assegnazioni a
             JOIN giocatori g ON g.id = a.giocatore_id

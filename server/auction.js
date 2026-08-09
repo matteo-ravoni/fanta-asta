@@ -93,7 +93,7 @@ function caricaStatoCompleto(db) {
         GROUP BY a.partecipante_id, g.ruolo_classico
     `).all();
     const acquisti = db.prepare(`
-        SELECT a.partecipante_id, g.nome, g.ruolo_classico, a.prezzo
+        SELECT a.partecipante_id, g.nome, g.ruolo_classico, g.ruolo_mantra, a.prezzo
         FROM assegnazioni a JOIN giocatori g ON g.id = a.giocatore_id
         ORDER BY a.assegnato_il
     `).all();
@@ -110,7 +110,7 @@ function caricaStatoCompleto(db) {
             totale: ruoli.P + ruoli.D + ruoli.C + ruoli.A,
             giocatori: acquisti
                 .filter((a) => a.partecipante_id === p.id)
-                .map((a) => ({ nome: a.nome, ruolo_classico: a.ruolo_classico, prezzo: a.prezzo })),
+                .map((a) => ({ nome: a.nome, ruolo_classico: a.ruolo_classico, ruolo_mantra: a.ruolo_mantra, prezzo: a.prezzo })),
         };
     });
 

@@ -2,24 +2,62 @@
   <p class="stato-messaggio">Un attimo…</p>
 } @else if (asta()) {
   @let a = asta()!;
-  @if (a.stato === 'non_iniziata') {
+  @if (a.stato === "non_iniziata") {
     <app-collegamento />
   } @else {
     @let g = a.giocatore_corrente;
     <div class="pagina">
+      <div class="colonna-centrale">
       <div class="intestazione">
         <div>
-          <h1>Si fa sul serio!</h1>
-          <p class="badge">{{ a.stato === 'sospesa' ? 'SOSPESA' : (a.stato === 'conclusa' ? 'CONCLUSA' : 'IN CORSO') }}</p>
+          <h1>ASTA</h1>
+          <p class="badge">
+            {{
+              a.stato === "sospesa"
+                ? "SOSPESA"
+                : a.stato === "conclusa"
+                  ? "CONCLUSA"
+                  : "IN CORSO"
+            }}
+          </p>
         </div>
         <div class="azioni">
-          <button type="button" [disabled]="a.stato !== 'in_corso' || azioneInCorso()" (click)="salta()">Salta</button>
-          @if (a.stato === 'sospesa') {
-            <button type="button" [disabled]="azioneInCorso()" (click)="riprendi()">Riprendi</button>
+          <button
+            type="button"
+            [disabled]="a.stato !== 'in_corso' || azioneInCorso()"
+            (click)="salta()"
+          >
+            Salta
+          </button>
+          @if (a.stato === "sospesa") {
+            <button
+              type="button"
+              [disabled]="azioneInCorso()"
+              (click)="riprendi()"
+            >
+              Riprendi
+            </button>
           } @else {
-            <button type="button" [disabled]="a.stato !== 'in_corso' || azioneInCorso()" (click)="sospendi()">Sospendi</button>
+            <button
+              type="button"
+              [disabled]="a.stato !== 'in_corso' || azioneInCorso()"
+              (click)="sospendi()"
+            >
+              Sospendi
+            </button>
           }
-          <button type="button" class="primario" [disabled]="a.stato !== 'in_corso' || a.offerta_corrente === null || azioneInCorso()" (click)="assegna()">Assegna</button>
+          <button
+            type="button"
+            class="primario"
+            [disabled]="
+              a.stato !== 'in_corso' ||
+              a.offerta_corrente === null ||
+              azioneInCorso()
+            "
+            (click)="assegna()"
+          >
+            Assegna
+          </button>
         </div>
       </div>
 
@@ -28,103 +66,203 @@
       }
 
       @if (a.partecipante_disconnesso) {
-        <p class="avviso">In attesa di {{ a.partecipante_disconnesso.nome_squadra }} (disconnesso)…</p>
+        <p class="avviso">
+          In attesa di
+          {{ a.partecipante_disconnesso.nome_squadra }} (disconnesso)…
+        </p>
       }
 
-      @if (a.stato === 'conclusa') {
+      @if (a.stato === "conclusa") {
         <div class="card esportazioni">
           <h2>Asta conclusa</h2>
-          <p class="sottotitolo">Dati congelati. File pronti per il download.</p>
+          <p class="sottotitolo">
+            Dati congelati. File pronti per il download.
+          </p>
           <div class="pulsanti">
-            <a href="/api/export/rose.csv" download class="link-download">CSV rose</a>
-            <a href="/api/export/asta_completo.xlsx" download class="link-download">Excel completo</a>
-            <a href="/api/export/dump.json" download class="link-download">Dump JSON</a>
+            <a href="/api/export/rose.csv" download class="link-download"
+              >CSV rose</a
+            >
+            <a
+              href="/api/export/asta_completo.xlsx"
+              download
+              class="link-download"
+              >Excel completo</a
+            >
+            <a href="/api/export/dump.json" download class="link-download"
+              >Dump JSON</a
+            >
           </div>
         </div>
       } @else {
-        <button type="button" class="chiudi-asta" [disabled]="azioneInCorso()" (click)="chiudiAsta()">Chiudi asta ed esporta</button>
+        <button
+          type="button"
+          class="chiudi-asta"
+          [disabled]="azioneInCorso() || !tutteRoseComplete()"
+          [title]="
+            tutteRoseComplete()
+              ? ''
+              : 'Rose incomplete: impossibile chiudere l\'asta finché tutte le squadre non hanno completato la rosa.'
+          "
+          (click)="chiudiAsta()"
+        >
+          Chiudi asta ed esporta
+        </button>
+        @if (!tutteRoseComplete()) {
+          <p class="sottotitolo">
+            Rose incomplete: la chiusura si sblocca quando tutte le squadre
+            hanno completato la rosa.
+          </p>
+        }
       }
 
       @if (g) {
         <div class="card giocatore">
-          <p class="ruolo">{{ g.ruolo_classico === 'P' ? 'PORTIERE' : g.ruolo_classico === 'D' ? 'DIFENSORE' : g.ruolo_classico === 'C' ? 'CENTROCAMPISTA' : 'ATTACCANTE' }}</p>
-          <h2>{{ g.nome }}</h2>
-          <p class="sottotitolo">{{ g.squadra_reale }} · Qt.A {{ g.quotazione_classica }} · FVM {{ g.fvm_classica }}</p>
+          <p class="ruolo">
+            {{
+              a.tipo_asta === "classica"
+                ? g.ruolo_classico === "P"
+                  ? "PORTIERE"
+                  : g.ruolo_classico === "D"
+                    ? "DIFENSORE"
+                    : g.ruolo_classico === "C"
+                      ? "CENTROCAMPISTA"
+                      : "ATTACCANTE"
+                : g.ruolo_mantra
+            }}
+          </p>
+          <h1>{{ g.nome }}</h1>
+          <p class="sottotitolo">
+            {{ g.squadra_reale }} · Qt.A {{ g.quotazione_classica }} · FVM
+            {{ g.fvm_classica }}
+          </p>
 
           <div class="riga-offerta">
             <div>
               <p class="etichetta">OFFERTA ATTUALE</p>
-              <p class="offerta">{{ a.offerta_corrente ?? '—' }}</p>
+              <p class="offerta">{{ a.offerta_corrente ?? "—" }}</p>
             </div>
             <div>
               <p class="etichetta">IN TESTA</p>
-              <p class="in-testa">{{ a.partecipante_in_testa?.nome_squadra ?? '—' }}</p>
+              <p class="in-testa">
+                {{ a.partecipante_in_testa?.nome_squadra ?? "—" }}
+              </p>
             </div>
           </div>
 
-          <p class="countdown">{{ countdownSecondi() ?? '—' }}</p>
-          <p class="sottotitolo">Countdown informativo — solo "Assegna" chiude l'asta</p>
+          <p class="countdown">{{ countdownSecondi() ?? "—" }}</p>
+          <p class="sottotitolo">
+            Countdown informativo — solo "Assegna" chiude l'asta
+          </p>
         </div>
 
         @if (a.rilanci_in_attesa.length > 0) {
           <div class="card">
             <h2>Rilanci in attesa di approvazione</h2>
-            <p class="sottotitolo">Arrivati dopo lo zero del countdown — l'host decide uno per uno. Nessuna lista "prossimi": il giocatore successivo si scopre solo cliccando Salta.</p>
+            <p class="sottotitolo">
+              Arrivati dopo lo zero del countdown — l'host decide uno per uno.
+              Nessuna lista "prossimi": il giocatore successivo si scopre solo
+              cliccando Salta.
+            </p>
             @for (r of a.rilanci_in_attesa; track r.id) {
               <div class="riga-rilancio">
-                <span>{{ r.partecipante.nome_squadra }} offre {{ r.importo }} crediti</span>
+                <span
+                  >{{ r.partecipante.nome_squadra }} offre
+                  {{ r.importo }} crediti</span
+                >
                 <span class="pulsanti-rilancio">
-                  <button type="button" [disabled]="azioneInCorso()" (click)="rifiuta(r.id)">Rifiuta</button>
-                  <button type="button" class="primario" [disabled]="azioneInCorso()" (click)="accetta(r.id)">Accetta</button>
+                  <button
+                    type="button"
+                    [disabled]="azioneInCorso()"
+                    (click)="rifiuta(r.id)"
+                  >
+                    Rifiuta
+                  </button>
+                  <button
+                    type="button"
+                    class="primario"
+                    [disabled]="azioneInCorso()"
+                    (click)="accetta(r.id)"
+                  >
+                    Accetta
+                  </button>
                 </span>
               </div>
             }
           </div>
         }
       } @else if (a.asta_esaurita) {
-        <p class="stato-messaggio">Nessun altro giocatore da bandire nel giro principale.</p>
+        <p class="stato-messaggio">
+          Nessun altro giocatore da bandire nel giro principale.
+        </p>
       }
+      </div>
 
-      <div class="card">
+      <div class="sezione-squadre">
         <h2>Squadre</h2>
-        @for (s of a.rose; track s.id) {
-          <div class="blocco-squadra">
-            <button type="button" class="riga-squadra" (click)="toggleSquadra(s.id)">
-              <span>{{ squadreEspanse().has(s.id) ? '▾' : '▸' }} {{ s.nome_squadra }}</span>
-              <span class="crediti-squadra">{{ s.crediti_residui }}</span>
+        <div class="griglia-squadre">
+          @for (s of a.rose; track s.id) {
+            <div class="colonna-squadra">
+              <div class="intestazione-colonna">
+                <span class="nome-squadra">{{ s.nome_squadra }}</span>
+                <span class="crediti-squadra">{{ s.crediti_residui }}</span>
+              </div>
               @if (configurazione(); as cfg) {
-                @if (a.tipo_asta === 'classica') {
-                  <span class="sottotitolo">P {{ s.ruoli['P'] }}/{{ cfg.slot_portieri }} · D {{ s.ruoli['D'] }}/{{ cfg.slot_difensori }} · C {{ s.ruoli['C'] }}/{{ cfg.slot_centrocampisti }} · A {{ s.ruoli['A'] }}/{{ cfg.slot_attaccanti }}</span>
+                @if (a.tipo_asta === "classica") {
+                  <p class="sottotitolo"
+                    >P {{ s.ruoli["P"] }}/{{ cfg.slot_portieri }} · D
+                    {{ s.ruoli["D"] }}/{{ cfg.slot_difensori }} · C
+                    {{ s.ruoli["C"] }}/{{ cfg.slot_centrocampisti }} · A
+                    {{ s.ruoli["A"] }}/{{ cfg.slot_attaccanti }}</p
+                  >
                 } @else {
-                  <span class="sottotitolo">{{ s.totale }}/{{ cfg.slot_totale_mantra }} giocatori · {{ s.ruoli['P'] }}/{{ cfg.slot_portieri }} portieri</span>
+                  <p class="sottotitolo"
+                    >{{ s.totale }}/{{ cfg.slot_totale_mantra }} giocatori ·
+                    {{ s.ruoli["P"] }}/{{ cfg.slot_portieri }} portieri</p
+                  >
                 }
               }
-            </button>
-            @if (squadreEspanse().has(s.id)) {
               <div class="lista-acquisti">
                 @if (s.giocatori.length === 0) {
                   <p class="sottotitolo">Nessun giocatore acquistato.</p>
                 } @else {
                   @for (g of s.giocatori; track g.nome) {
                     <div class="riga-acquisto">
-                      <span class="ruolo" [attr.data-ruolo]="g.ruolo_classico">{{ g.ruolo_classico }}</span>
+                      <span
+                        class="ruolo"
+                        [attr.data-ruolo]="g.ruolo_classico"
+                        >{{
+                          a.tipo_asta === "classica"
+                            ? g.ruolo_classico
+                            : g.ruolo_mantra
+                        }}</span
+                      >
                       <span>{{ g.nome }}</span>
                       <span class="prezzo-acquisto">{{ g.prezzo }}</span>
                     </div>
                   }
                 }
               </div>
-            }
-          </div>
-        }
+            </div>
+          }
+        </div>
       </div>
 
-      <button type="button" class="link-admin" (click)="pannelloAdminAperto.set(!pannelloAdminAperto())">
-        {{ pannelloAdminAperto() ? 'Nascondi log & correzioni' : 'Log & correzioni' }}
+      <div class="colonna-centrale">
+      <button
+        type="button"
+        class="link-admin"
+        (click)="pannelloAdminAperto.set(!pannelloAdminAperto())"
+      >
+        {{
+          pannelloAdminAperto()
+            ? "Nascondi log & correzioni"
+            : "Log & correzioni"
+        }}
       </button>
       @if (pannelloAdminAperto()) {
-        <app-admin-panel />
+        <app-admin-panel [tipoAsta]="a.tipo_asta" />
       }
+      </div>
     </div>
   }
 }

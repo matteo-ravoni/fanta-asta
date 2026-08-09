@@ -9,6 +9,7 @@ interface Giocatore {
   nome: string;
   squadra_reale: string;
   ruolo_classico: string;
+  ruolo_mantra: string;
   quotazione_classica: number;
   fvm_classica: number | null;
 }
@@ -22,6 +23,7 @@ interface RilancioInAttesa {
 interface GiocatoreAcquistato {
   nome: string;
   ruolo_classico: string;
+  ruolo_mantra: string;
   prezzo: number;
 }
 
@@ -59,7 +61,7 @@ interface Configurazione {
   selector: 'app-stanza',
   imports: [CollegamentoComponent, AdminPanelComponent],
   templateUrl: './stanza.component.html',
-  styleUrl: './stanza.component.css'
+  styleUrl: './stanza.component.css',
 })
 export class StanzaComponent implements OnInit, OnDestroy {
   private readonly http = inject(HttpClient);
@@ -72,7 +74,6 @@ export class StanzaComponent implements OnInit, OnDestroy {
   protected readonly erroreAzione = signal<string | null>(null);
   protected readonly azioneInCorso = signal(false);
   protected readonly pannelloAdminAperto = signal(false);
-  protected readonly squadreEspanse = signal<Set<number>>(new Set());
 
   private intervalloCountdown: ReturnType<typeof setInterval> | null = null;
 
@@ -90,7 +91,9 @@ export class StanzaComponent implements OnInit, OnDestroy {
       },
       error: () => this.caricamento.set(false),
     });
-    this.http.get<{ configurazione: Configurazione }>('/api/configurazione').subscribe((r) => this.configurazione.set(r.configurazione));
+    this.http
+      .get<{ configurazione: Configurazione }>('/api/configurazione')
+      .subscribe((r) => this.configurazione.set(r.configurazione));
     this.socketService.on('asta:stato', this.aggiorna);
 
     this.intervalloCountdown = setInterval(() => {
@@ -99,7 +102,9 @@ export class StanzaComponent implements OnInit, OnDestroy {
         this.countdownSecondi.set(null);
         return;
       }
-      const restanti = Math.ceil((new Date(scadenza).getTime() - this.socketService.oraServer()) / 1000);
+      const restanti = Math.ceil(
+        (new Date(scadenza).getTime() - this.socketService.oraServer()) / 1000,
+      );
       this.countdownSecondi.set(Math.max(0, restanti));
     }, 200);
   }
@@ -145,18 +150,27 @@ export class StanzaComponent implements OnInit, OnDestroy {
     this.eseguiAzione(`/api/rilanci/${rilancioId}/rifiuta`);
   }
 
-  protected toggleSquadra(partecipanteId: number): void {
-    const aggiornato = new Set(this.squadreEspanse());
-    if (aggiornato.has(partecipanteId)) {
-      aggiornato.delete(partecipanteId);
-    } else {
-      aggiornato.add(partecipanteId);
-    }
-    this.squadreEspanse.set(aggiornato);
-  }
+  protected readonly tutteRoseComplete = (): boolean => {
+    const a = this.asta();
+    const cfg = this.configurazione();
+    if (!a || !cfg) return false;
+    return a.rose.every((s) =>
+      a.tipo_asta === 'classica'
+        ? (s.ruoli['P'] ?? 0) >= cfg.slot_portieri &&
+          (s.ruoli['D'] ?? 0) >= cfg.slot_difensori &&
+          (s.ruoli['C'] ?? 0) >= cfg.slot_centrocampisti &&
+          (s.ruoli['A'] ?? 0) >= cfg.slot_attaccanti
+        : s.totale >= cfg.slot_totale_mantra,
+    );
+  };
 
   protected chiudiAsta(): void {
-    if (!confirm("Chiudere l'asta ed esportare i file? L'operazione non è reversibile.")) return;
+    if (
+      !confirm(
+        "Chiudere l'asta ed esportare i file? L'operazione non è reversibile.",
+      )
+    )
+      return;
     this.eseguiAzione('/api/asta/chiudi');
   }
 }
