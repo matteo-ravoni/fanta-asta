@@ -22,6 +22,12 @@ function getDb() {
         db.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
     }
 
+    // Migrazione leggera e idempotente per DB creati prima dell'introduzione del countdown configurabile.
+    const colonneConfigurazione = db.prepare("PRAGMA table_info(configurazione)").all();
+    if (!colonneConfigurazione.some((c) => c.name === 'durata_countdown_secondi')) {
+        db.exec('ALTER TABLE configurazione ADD COLUMN durata_countdown_secondi INTEGER NOT NULL DEFAULT 10');
+    }
+
     return db;
 }
 

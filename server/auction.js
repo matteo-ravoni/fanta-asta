@@ -1,7 +1,5 @@
 const express = require('express');
 
-const DURATA_COUNTDOWN_MS = 10000;
-
 function log(db, tipo_azione, dettagli, riferimenti = {}) {
     db.prepare('INSERT INTO log_admin (tipo_azione, giocatore_id, partecipante_id, dettagli) VALUES (?, ?, ?, ?)')
         .run(tipo_azione, riferimenti.giocatore_id ?? null, riferimenti.partecipante_id ?? null, JSON.stringify(dettagli ?? {}));
@@ -235,7 +233,7 @@ function creaRouter(getDb, io) {
             .run(stato.giocatore_corrente_id, partecipante.id, importo, nuovoStatoOfferta);
 
         if (!inZonaPostZero) {
-            const nuovaScadenza = new Date(ora + DURATA_COUNTDOWN_MS).toISOString();
+            const nuovaScadenza = new Date(ora + configurazione.durata_countdown_secondi * 1000).toISOString();
             db.prepare('UPDATE stato_asta SET offerta_corrente = ?, partecipante_in_testa_id = ?, countdown_scadenza = ? WHERE id = 1')
                 .run(importo, partecipante.id, nuovaScadenza);
         }
@@ -254,12 +252,13 @@ function creaRouter(getDb, io) {
         if (offerta.giocatore_id !== stato.giocatore_corrente_id) {
             return res.status(409).json({ errori: ['Il giocatore non è più in asta.'] });
         }
+        const configurazione = db.prepare('SELECT durata_countdown_secondi FROM configurazione WHERE id = 1').get();
 
         db.transaction(() => {
             db.prepare("UPDATE offerte SET stato = 'accettata_host' WHERE id = ?").run(offerta.id);
             db.prepare("UPDATE offerte SET stato = 'rifiutata_host' WHERE giocatore_id = ? AND stato = 'in_attesa_host' AND importo <= ?")
                 .run(offerta.giocatore_id, offerta.importo);
-            const nuovaScadenza = new Date(Date.now() + DURATA_COUNTDOWN_MS).toISOString();
+            const nuovaScadenza = new Date(Date.now() + configurazione.durata_countdown_secondi * 1000).toISOString();
             db.prepare('UPDATE stato_asta SET offerta_corrente = ?, partecipante_in_testa_id = ?, countdown_scadenza = ? WHERE id = 1')
                 .run(offerta.importo, offerta.partecipante_id, nuovaScadenza);
             log(db, 'accetta_rilancio', { offerta_id: offerta.id, importo: offerta.importo }, { giocatore_id: offerta.giocatore_id, partecipante_id: offerta.partecipante_id });

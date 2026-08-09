@@ -45,6 +45,7 @@ function leggiBodyConfigurazione(body) {
         slot_attaccanti: numero(body.slot_attaccanti),
         slot_totale_mantra: numero(body.slot_totale_mantra),
         ordine_uscita: body.ordine_uscita,
+        durata_countdown_secondi: numero(body.durata_countdown_secondi),
     };
 }
 
@@ -92,6 +93,10 @@ function validaConfigurazione(cfg) {
 
     if (!['casuale', 'per_ruolo', 'alfabetico'].includes(cfg.ordine_uscita)) {
         errori.push('L\'ordine di uscita deve essere "casuale", "per_ruolo" o "alfabetico".');
+    }
+
+    if (!Number.isInteger(cfg.durata_countdown_secondi) || cfg.durata_countdown_secondi <= 0) {
+        errori.push('La durata del countdown deve essere un intero positivo di secondi.');
     }
 
     return errori;
@@ -169,12 +174,12 @@ function creaRouter(getDb) {
             db.prepare('DELETE FROM configurazione').run();
 
             db.prepare(`INSERT INTO configurazione
-                (id, numero_partecipanti, crediti_iniziali, tipo_asta, slot_portieri, slot_difensori, slot_centrocampisti, slot_attaccanti, slot_totale_mantra, ordine_uscita)
-                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+                (id, numero_partecipanti, crediti_iniziali, tipo_asta, slot_portieri, slot_difensori, slot_centrocampisti, slot_attaccanti, slot_totale_mantra, ordine_uscita, durata_countdown_secondi)
+                VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
             ).run(
                 cfg.numero_partecipanti, cfg.crediti_iniziali, cfg.tipo_asta,
                 cfg.slot_portieri, cfg.slot_difensori, cfg.slot_centrocampisti, cfg.slot_attaccanti, cfg.slot_totale_mantra,
-                cfg.ordine_uscita
+                cfg.ordine_uscita, cfg.durata_countdown_secondi
             );
 
             const insPartecipante = db.prepare('INSERT INTO partecipanti (nome_squadra, ordine, crediti_residui) VALUES (?, ?, ?)');

@@ -21,6 +21,7 @@ CREATE TABLE configurazione (
     slot_totale_mantra      INTEGER CHECK (slot_totale_mantra > 0),
 
     ordine_uscita           TEXT NOT NULL CHECK (ordine_uscita IN ('casuale', 'per_ruolo', 'alfabetico')),
+    durata_countdown_secondi INTEGER NOT NULL DEFAULT 10 CHECK (durata_countdown_secondi > 0),
     creata_il               TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     aggiornata_il           TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
 

@@ -84,6 +84,15 @@
     </section>
 
     <section class="card">
+      <h2>Countdown</h2>
+      <label>
+        Durata countdown (secondi)
+        <input type="number" formControlName="durata_countdown_secondi" min="1">
+      </label>
+      <p class="sottotitolo">Tempo che riparte ad ogni rilancio prima che l'offerta si chiuda.</p>
+    </section>
+
+    <section class="card">
       <h2>Dai, carica il listone!</h2>
       <p class="sottotitolo">File .xlsx con le colonne Id, R, RM, Nome, Squadra, Qt.A, Qt.A M, FVM, FVM M.</p>
       <input type="file" accept=".xlsx" (change)="onFileSelezionato($event)">

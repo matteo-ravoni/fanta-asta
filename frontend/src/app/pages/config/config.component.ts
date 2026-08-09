@@ -48,6 +48,7 @@ export class ConfigComponent implements OnInit {
     slot_attaccanti: this.fb.nonNullable.control(6, [Validators.required, Validators.min(1)]),
     slot_totale_mantra: this.fb.nonNullable.control(25, [Validators.required, Validators.min(1)]),
     ordine_uscita: this.fb.nonNullable.control<'casuale' | 'per_ruolo' | 'alfabetico'>('casuale'),
+    durata_countdown_secondi: this.fb.nonNullable.control(10, [Validators.required, Validators.min(1)]),
   });
 
   ngOnInit(): void {
@@ -102,6 +103,7 @@ export class ConfigComponent implements OnInit {
     fd.append('crediti_iniziali', String(v.crediti_iniziali));
     fd.append('tipo_asta', v.tipo_asta);
     fd.append('ordine_uscita', v.ordine_uscita);
+    fd.append('durata_countdown_secondi', String(v.durata_countdown_secondi));
     if (v.tipo_asta === 'classica') {
       fd.append('slot_portieri', String(v.slot_portieri));
       fd.append('slot_difensori', String(v.slot_difensori));
